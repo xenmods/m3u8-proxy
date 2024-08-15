@@ -74,6 +74,11 @@ router.get('/segment', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'No URL provided' });
   }
 
+  // Check if the URL ends with .m3u8
+  if (!url.endsWith('.m3u8')) {
+    return res.status(400).json({ error: 'Only .m3u8 files are supported' });
+  }
+
   try {
     const response = await axios({
       method: 'get',
@@ -81,31 +86,13 @@ router.get('/segment', async (req: Request, res: Response) => {
       responseType: 'arraybuffer',
     });
 
-    const fileExtension = path.extname(url).toLowerCase();
-
-    // Set appropriate Content-Type based on file extension
-    switch (fileExtension) {
-      case '.mp4':
-        res.setHeader('Content-Type', 'video/mp4');
-        break;
-      case '.mkv':
-        res.setHeader('Content-Type', 'video/x-matroska');
-        break;
-      case '.webm':
-        res.setHeader('Content-Type', 'video/webm');
-        break;
-      case '.ts':
-        res.setHeader('Content-Type', 'video/MP2T');
-        break;
-      default:
-        res.setHeader('Content-Type', 'application/octet-stream');
-    }
-
+    // Set appropriate Content-Type for m3u8
+    res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
     res.setHeader('Content-Disposition', 'inline');
     res.send(response.data);
   } catch (error) {
-    console.error('Error fetching the video segment:', (error as Error).message);
-    res.status(500).json({ error: 'Failed to proxy video segment' });
+    console.error('Error fetching the m3u8 file:', (error as Error).message);
+    res.status(500).json({ error: 'Failed to proxy m3u8 file' });
   }
 });
 
