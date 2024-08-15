@@ -29,7 +29,7 @@ app.get('/proxy/m3u8', async (req, res) => {
     let m3u8Content = response.data;
 
     ///const baseUrl = `${req.protocol}://${req.get('host')}/proxy/segment?url=`;
-    const baseUrl = `https://nekoplayer.xyz/proxy/segment?url=`;
+    const baseUrl = `https://node-proxy.5yg3y1.easypanel.host/proxy/segment?url=`;
 
     m3u8Content = m3u8Content.replace(/(.*\.ts)/g, (match) => {
       return baseUrl + encodeURIComponent(new URL(match, url).href);
