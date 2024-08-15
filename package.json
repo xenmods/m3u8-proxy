@@ -2,6 +2,7 @@
   "name": "m3u8-proxy",
   "module": "src/index.ts",
   "type": "module",
+  "packageManager": "bun",
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -16,6 +17,7 @@
     "morgan": "^1.10.0"
   },
   "scripts": {
-    "start": "bun src/index.ts"
+    "start": "bun src/index.ts",
+    "dev": "bun src/index.ts --watch"
   }
 }
