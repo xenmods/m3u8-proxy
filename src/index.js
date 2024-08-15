@@ -1,14 +1,16 @@
 import express from 'express';
 import axios from 'axios';
 import morgan from 'morgan';
+import cors from 'cors';
 
 const app = express();
 
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
-    next();
-});
+app.use(cors(
+  {
+    origin: ['http://localhost:4000', 'https://node-player.5yg3y1.easypanel.host/', 'https://nekoplayer.xyz/'],
+    methods: ['GET', 'POST'],
+  }
+));
 
 app.use(morgan('combined'));
 
