@@ -1,19 +1,14 @@
 import express from 'express';
 import axios from 'axios';
 import morgan from 'morgan';
-import cors_proxy from 'cors-anywhere';
 
 const app = express();
 
-// Set up cors-anywhere options
-const corsOptions = {
-    originWhitelist: [], // Allow all origins
-    requireHeader: ['origin', 'x-requested-with'],
-    removeHeaders: ['cookie', 'cookie2'],
-};
-
-// Create the cors-anywhere server
-const corsProxyServer = cors_proxy.createServer(corsOptions);
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    next();
+});
 
 app.use(morgan('combined'));
 
