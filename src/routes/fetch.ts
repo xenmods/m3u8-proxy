@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const router = Router();
 
-router.get('/', async (req: Request, res: Response) => {
+router.get('/m3u8', async (req: Request, res: Response) => {
   const { url, ref } = req.query;
 
   if (!url || typeof url !== 'string') {
