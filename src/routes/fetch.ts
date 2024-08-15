@@ -19,6 +19,7 @@ router.get('/', async (req: Request, res: Response) => {
 
     let m3u8Content = response.data as string;
     
+    ///// aaaaaaaaaaaaaaaaa
     const baseUrl = `https://${req.get('host')}/fetch/segment?url=`;
 
     m3u8Content = m3u8Content.replace(/(.*\.ts)/g, (match) => {
