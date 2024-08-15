@@ -19,7 +19,7 @@ router.get('/m3u8', async (req: Request, res: Response) => {
 
     let m3u8Content = response.data as string;
     
-    ///// aaaaaaaaaaaaaaaaa
+    // if you try to use localhost, You will not have a good time
     const baseUrl = `https://${req.get('host')}/fetch/segment?url=`;
 
     m3u8Content = m3u8Content.replace(/(.*\.ts)/g, (match) => {
@@ -51,7 +51,7 @@ router.get('/segment', async (req: Request, res: Response) => {
 
     res.setHeader('Content-Type', 'video/MP2T');
     res.setHeader('Content-Disposition', 'inline');
-    // send keep-alive header
+    // send keep-alive header cuz mpv was complaining about it
     res.setHeader('Connection', 'Keep-Alive');
     res.send(response.data);
   } catch (error) {

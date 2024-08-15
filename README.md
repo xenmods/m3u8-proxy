@@ -2,6 +2,10 @@
 
 `m3u8-proxy` is a TypeScript-based proxy server that serves M3U8 playlist files. It is designed to be lightweight, easy to deploy, and efficient for streaming purposes.
 
+## Note
+
+This proxy is only for m3u8 files, i might add support for other file types in the future.
+
 ## Features
 
 - **Serve M3U8 files**: Acts as a proxy server to handle and serve M3U8 files, ensuring smooth streaming experiences.
