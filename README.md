@@ -10,6 +10,14 @@
 - **Lightweight**: Minimal dependencies to keep the project fast and responsive.
 - **Efficient**: Designed to be efficient for streaming purposes.
 
+## Usage
+
+Here is how you can use `m3u8-proxy`:
+
+```
+your-server.com/fetch/m3u8?url=https://example.com/playlist.m3u8
+```
+
 ## Deployment 
 
 It seems bun is not working with Render.
