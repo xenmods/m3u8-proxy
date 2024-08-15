@@ -8,6 +8,7 @@
 - **Easy Deployment**: Quickly deployable to cloud platforms such as Vercel.
 - **TypeScript**: Written in TypeScript for robust type safety and maintainability.
 - **Lightweight**: Minimal dependencies to keep the project fast and responsive.
+- **Efficient**: Designed to be efficient for streaming purposes.
 
 ## Deployment 
 

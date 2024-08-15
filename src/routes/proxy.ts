@@ -15,7 +15,7 @@ router.get('/m3u8', async (req: Request, res: Response) => {
     const response = await axios.get(url);
     let m3u8Content = response.data as string;
 
-    const baseUrl = `https://${req.get('host')}/proxy/segment?url=`;
+    const baseUrl = `https://${req.get('host')}/fetch/segment?url=`;
 
     m3u8Content = m3u8Content.replace(/(.*\.ts)/g, (match) => {
       return baseUrl + encodeURIComponent(new URL(match, url).href);
