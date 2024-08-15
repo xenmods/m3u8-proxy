@@ -12,5 +12,3 @@ services:
     plan: free 
     routes:
       - type: web
-        src: /* 
-        dest: /

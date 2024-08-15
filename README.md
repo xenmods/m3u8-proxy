@@ -12,4 +12,4 @@
 
 ## Deployment 
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://vercel.com/new/clone?repository-url=https://github.com/DeveloperJosh/m3u8-proxy)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
