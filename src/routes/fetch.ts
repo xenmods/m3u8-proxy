@@ -51,6 +51,8 @@ router.get('/segment', async (req: Request, res: Response) => {
 
     res.setHeader('Content-Type', 'video/MP2T');
     res.setHeader('Content-Disposition', 'inline');
+    // send keep-alive header
+    res.setHeader('Connection', 'Keep-Alive');
     res.send(response.data);
   } catch (error) {
     console.error('Error fetching the video segment:', (error as Error).message);
