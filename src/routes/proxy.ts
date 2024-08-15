@@ -5,6 +5,7 @@ const router = Router();
 
 router.get('/m3u8', async (req: Request, res: Response) => {
   const { url } = req.query;
+  console.log('url:', url);
 
   if (!url || typeof url !== 'string') {
     return res.status(400).json({ error: 'No URL provided' });
