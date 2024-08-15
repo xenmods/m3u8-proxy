@@ -7,8 +7,20 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-    autoDeploy: true 
-    healthCheckPath: /health 
-    plan: free 
+    autoDeploy: true
+    healthCheckPath: /health
+    plan: free
     routes:
-      - type: web
+      - type: rewrite
+        source: /
+        destination: /
+      - type: rewrite
+        source: /fetch
+        destination: /fetch
+      - type: rewrite
+        source: /fetch/m3u8
+        destination: /fetch/m3u8
+      - type: rewrite
+        source: /fetch/segment
+        destination: /fetch/segment
+    runtime: bun
