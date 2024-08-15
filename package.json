@@ -1,8 +1,7 @@
 {
   "name": "m3u8-proxy",
-  "module": "src/index.ts",
   "type": "module",
-  "packageManager": "bun",
+  "packageManager": "bun@1.1.21",
   "devDependencies": {
     "@types/bun": "latest"
   },
