@@ -17,7 +17,7 @@ app.use(cors({
 app.use(morgan('combined'));
 
 app.use('/', indexRouter);
-app.use('/proxy', proxyRouter);
+app.use('/fetch', proxyRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
