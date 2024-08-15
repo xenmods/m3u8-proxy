@@ -12,4 +12,6 @@
 
 ## Deployment 
 
+It seems bun is not working with Render.
+
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/DeveloperJosh/m3u8-proxy.git)

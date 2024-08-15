@@ -3,7 +3,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 
 import indexRouter from './routes/index.ts';
-import proxyRouter from './routes/proxy.ts';
+import proxyRouter from './routes/fetch.ts';
 
 const app = express();
 
@@ -17,6 +17,7 @@ app.use(cors({
 app.use(morgan('combined'));
 
 app.use('/', indexRouter);
+// had to rename as my host does not support fetch as a route
 app.use('/fetch', proxyRouter);
 
 const PORT = process.env.PORT || 3000;
