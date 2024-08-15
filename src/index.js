@@ -28,7 +28,8 @@ app.get('/proxy/m3u8', async (req, res) => {
     const response = await axios.get(url);
     let m3u8Content = response.data;
 
-    const baseUrl = `${req.protocol}://${req.get('host')}/proxy/segment?url=`;
+    ///const baseUrl = `${req.protocol}://${req.get('host')}/proxy/segment?url=`;
+    const baseUrl = `https://nekoplayer.xyz/proxy/segment?url=`;
 
     m3u8Content = m3u8Content.replace(/(.*\.ts)/g, (match) => {
       return baseUrl + encodeURIComponent(new URL(match, url).href);
