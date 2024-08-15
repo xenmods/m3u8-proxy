@@ -17,6 +17,6 @@
     "redis": "^4.7.0"
   },
   "scripts": {
-    "start": "bun src/index.js"
+    "start": "node src/index.js"
   }
 }
