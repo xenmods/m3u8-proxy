@@ -13,6 +13,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/proxy/m3u8', async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
   const { url } = req.query;
 
   if (!url) {
@@ -49,6 +50,7 @@ app.get('/proxy/m3u8', async (req, res) => {
 });
 
 app.get('/proxy/segment', async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
   const { url } = req.query;
 
   if (!url) {
