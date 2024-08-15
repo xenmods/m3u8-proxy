@@ -5,7 +5,6 @@ import path from 'path';
 
 const router = Router();
 
-
 router.get('/', async (req: Request, res: Response) => {
   const { url } = req.query;
 
@@ -15,13 +14,12 @@ router.get('/', async (req: Request, res: Response) => {
 
   try {
     const response = await axios.get(url, {
-      responseType: 'text', // Ensure we're getting the HTML as text
+      responseType: 'text',
     });
 
     if (response.headers['content-type']?.includes('text/html')) {
       const $ = load(response.data);
 
-      // Rewrite relative URLs to absolute URLs
       $('a[href], link[href], img[src], script[src]').each((_, element) => {
         const attr = $(element).is('img') || $(element).is('script') ? 'src' : 'href';
         const value = $(element).attr(attr);
@@ -108,51 +106,6 @@ router.get('/segment', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching the video segment:', (error as Error).message);
     res.status(500).json({ error: 'Failed to proxy video segment' });
-  }
-});
-
-router.get('/video', async (req: Request, res: Response) => {
-  const { url } = req.query;
-
-  if (!url || typeof url !== 'string') {
-    return res.status(400).json({ error: 'No URL provided' });
-  }
-
-  try {
-    const response = await axios({
-      method: 'get',
-      url,
-      responseType: 'arraybuffer',
-    });
-
-    const fileExtension = path.extname(url).toLowerCase();
-
-    // Set appropriate Content-Type based on file extension
-    switch (fileExtension) {
-      case '.mp4':
-        res.setHeader('Content-Type', 'video/mp4');
-        break;
-      case '.mkv':
-        res.setHeader('Content-Type', 'video/x-matroska');
-        break;
-      case '.webm':
-        res.setHeader('Content-Type', 'video/webm');
-        break;
-      case '.ts':
-        res.setHeader('Content-Type', 'video/MP2T');
-        break;
-      case '.m3u8':
-        res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
-        break;
-      default:
-        return res.status(415).json({ error: 'Unsupported media type' });
-    }
-
-    res.setHeader('Content-Disposition', 'inline');
-    res.send(response.data);
-  } catch (error) {
-    console.error('Error fetching the video file:', (error as Error).message);
-    res.status(500).json({ error: 'Failed to proxy video file' });
   }
 });
 

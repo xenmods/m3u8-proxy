@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: simple-proxy
+    env: standard
+    buildCommand: bun install
+    startCommand: bun start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    autoDeploy: true 
+    healthCheckPath: /health 
+    plan: free 
+    routes:
+      - type: web
+        src: /* 
+        dest: /

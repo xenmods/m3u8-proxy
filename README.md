@@ -1,15 +1,14 @@
 # m3u8-proxy
 
-To install dependencies:
+`m3u8-proxy` is a TypeScript-based proxy server that serves M3U8 playlist files. It is designed to be lightweight, easy to deploy, and efficient for streaming purposes.
 
-```bash
-bun install
-```
+## Features
 
-To run:
+- **Serve M3U8 files**: Acts as a proxy server to handle and serve M3U8 files, ensuring smooth streaming experiences.
+- **Easy Deployment**: Quickly deployable to cloud platforms such as Vercel.
+- **TypeScript**: Written in TypeScript for robust type safety and maintainability.
+- **Lightweight**: Minimal dependencies to keep the project fast and responsive.
 
-```bash
-bun run src/index.js
-```
+## Deployment 
 
-This project was created using `bun init` in bun v1.1.21. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://vercel.com/new/clone?repository-url=https://github.com/DeveloperJosh/m3u8-proxy)
