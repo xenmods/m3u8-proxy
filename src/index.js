@@ -1,11 +1,20 @@
 import express from 'express';
 import axios from 'axios';
 import morgan from 'morgan';
-import cors from 'cors';
+import cors_proxy from 'cors-anywhere';
 
 const app = express();
 
-app.use(cors({ origin: '*' }));
+// Set up cors-anywhere options
+const corsOptions = {
+    originWhitelist: [], // Allow all origins
+    requireHeader: ['origin', 'x-requested-with'],
+    removeHeaders: ['cookie', 'cookie2'],
+};
+
+// Create the cors-anywhere server
+const corsProxyServer = cors_proxy.createServer(corsOptions);
+
 app.use(morgan('combined'));
 
 app.get('/', (req, res) => {
@@ -35,14 +44,10 @@ app.get('/proxy/m3u8', async (req, res) => {
     res.send(m3u8Content);
   } catch (error) {
     if (error.response) {
-      // Request was made and server responded with a status code
-      // that falls out of the range of 2xx
       console.error(`Error fetching the m3u8 file: Status ${error.response.status}`);
     } else if (error.request) {
-      // The request was made but no response was received
       console.error('Error fetching the m3u8 file: No response received');
     } else {
-      // Something happened in setting up the request that triggered an Error
       console.error('Error fetching the m3u8 file:', error.message);
     }
     res.status(500).json({ error: 'Failed to proxy m3u8 file' });
@@ -77,6 +82,11 @@ app.get('/proxy/segment', async (req, res) => {
     }
     res.status(500).json({ error: 'Failed to proxy video segment' });
   }
+});
+
+// Handle CORS Anywhere requests
+app.use('/cors-anywhere/', (req, res) => {
+    corsProxyServer.emit('request', req, res);
 });
 
 const PORT = process.env.PORT || 3000;
