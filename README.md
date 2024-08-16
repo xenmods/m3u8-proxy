@@ -9,17 +9,17 @@ This proxy is only for m3u8 files, i might add support for other file types in t
 ## Features
 
 - **Serve M3U8 files**: Acts as a proxy server to handle and serve M3U8 files, ensuring smooth streaming experiences.
-- **Easy Deployment**: Quickly deployable to cloud platforms such as Vercel.
+- **Easy Deployment**: Quickly deployable to cloud platforms such as Koyeb.
 - **TypeScript**: Written in TypeScript for robust type safety and maintainability.
 - **Lightweight**: Minimal dependencies to keep the project fast and responsive.
 - **Efficient**: Designed to be efficient for streaming purposes.
 
-## Usage
+## Try it out
 
-Here is how you can use `m3u8-proxy`:
+You can try out the proxy server by making a request to the following URL:
 
 ```
-your-server.com/fetch/m3u8?url=https://example.com/playlist.m3u8
+https://renewed-georgeanne-nekonode-1aa70c0c.koyeb.app/fetch/m3u8?url=https://example.com/playlist.m3u8
 ```
 
 ## Deployment 
