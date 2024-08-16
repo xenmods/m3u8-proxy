@@ -14,12 +14,16 @@ router.get('/image', (req: Request, res: Response) => {
     method: 'get',
     url,
     responseType: 'stream',
-  }).then((response) => {
-    response.data.pipe(res);
-  }).catch((error) => {
-    console.error('Error fetching the image:', (error as Error).message);
-    res.status(500).json({ error: 'Failed to proxy image' });
-  });
+  })
+    .then((response) => {
+      res.setHeader('Content-Type', response.headers['content-type']);
+      res.setHeader('Content-Disposition', 'inline');
+      response.data.pipe(res);
+    })
+    .catch((error) => {
+      console.error('Error fetching the image:', (error as Error).message);
+      res.status(500).json({ error: 'Failed to proxy image' });
+    });
 });
 
 router.get('/m3u8', async (req: Request, res: Response) => {
