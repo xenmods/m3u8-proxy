@@ -1,0 +1,20 @@
+[
+    "text/html", 
+    "text/css", 
+    "application/javascript",
+    "application/vnd.apple.mpegurl",
+    "application/json", 
+    "image/png", 
+    "image/jpeg", 
+    "image/gif", 
+    "image/webp", 
+    "image/svg+xml", 
+    "image/x-icon",
+    "video/octet-stream",
+    "video/webm",
+    "video/m3u8",
+    "audio/mpeg",
+    "audio/ogg",
+    "audio/wav",
+    "audio/webm"
+]

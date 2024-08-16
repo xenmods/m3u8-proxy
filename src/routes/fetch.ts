@@ -1,23 +1,11 @@
 import { Router, type Request, type Response } from 'express';
 import axios from 'axios';
+import https from 'https';
+import supported_types from '../config/supported_types.json';
 
 // rewriting this code was an absolute pain, I'll probably do it again later aa.
 
 const router = Router();
-
-const supported_types = [
-  'text/html', 
-  'text/css', 
-  'application/javascript',
-  'application/vnd.apple.mpegurl',
-  'application/json', 
-  'image/png', 
-  'image/jpeg', 
-  'image/gif', 
-  'image/webp', 
-  'image/svg+xml', 
-  'image/x-icon'
-];
 
 router.get('/', async (req: Request, res: Response) => {
   const { url, ref } = req.query;
@@ -55,6 +43,7 @@ router.get('/', async (req: Request, res: Response) => {
 
         res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
         res.setHeader('Content-Disposition', 'inline');
+        res.setHeader('Connection', 'Keep-Alive');
         res.send(m3u8Content);
       });
 
@@ -83,6 +72,11 @@ router.get('/segment', async (req: Request, res: Response) => {
       method: 'get',
       url,
       responseType: 'arraybuffer',
+      headers: {
+        'Connection': 'keep-alive'
+      },
+      // keep-alive is required for video segments
+      httpsAgent: new https.Agent({ keepAlive: true })
     });
 
     const contentType = response.headers['content-type'] || 'application/octet-stream';

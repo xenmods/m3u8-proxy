@@ -4,7 +4,7 @@
 
 ## Note
 
-This proxy is only for m3u8 files, i might add support for other file types in the future.
+This proxy will work for most M3U8 files, but it may not work for all. If you encounter any issues, please open an issue on this repository.
 
 ## Features
 
@@ -19,14 +19,18 @@ This proxy is only for m3u8 files, i might add support for other file types in t
 You can try out the proxy by making a request to the following URL:
 
 ```
-https://renewed-georgeanne-nekonode-1aa70c0c.koyeb.app/fetch/m3u8?url=https://example.com/playlist.m3u8
+https://renewed-georgeanne-nekonode-1aa70c0c.koyeb.app/fetch/?url=https://example.com/playlist.m3u8
 ```
 
 Using this for Images:
 
 ```
-https://renewed-georgeanne-nekonode-1aa70c0c.koyeb.app/fetch/image?url=https://gogocdn.net/cover/dead-dead-demons-dededede-destruction.png
+https://renewed-georgeanne-nekonode-1aa70c0c.koyeb.app/fetch/?url=https://gogocdn.net/cover/dead-dead-demons-dededede-destruction.png
 ```
+
+# Note
+
+You can use it to view website but you will not be able to view the js, css, svg, etc. files within the website.
 
 ## Deployment 
 
