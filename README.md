@@ -24,6 +24,4 @@ your-server.com/fetch/m3u8?url=https://example.com/playlist.m3u8
 
 ## Deployment 
 
-It seems bun is not working with Render.
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/DeveloperJosh/m3u8-proxy.git)
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?name=simple-proxy&type=git&repository=DeveloperJosh/m3u8-proxy&branch=main&env[PORT]=3000&ports=3000;http;/&builder=dockerfile)
