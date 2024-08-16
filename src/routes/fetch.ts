@@ -1,32 +1,25 @@
 import { Router, type Request, type Response } from 'express';
 import axios from 'axios';
 
+// rewriting this code was an absolute pain, I'll probably do it again later aa.
+
 const router = Router();
 
-router.get('/image', (req: Request, res: Response) => {
-  const { url } = req.query;
+const supported_types = [
+  'text/html', 
+  'text/css', 
+  'application/javascript',
+  'application/vnd.apple.mpegurl',
+  'application/json', 
+  'image/png', 
+  'image/jpeg', 
+  'image/gif', 
+  'image/webp', 
+  'image/svg+xml', 
+  'image/x-icon'
+];
 
-  if (!url || typeof url !== 'string') {
-    return res.status(400).json({ error: 'No URL provided' });
-  }
-
-  axios({
-    method: 'get',
-    url,
-    responseType: 'stream',
-  })
-    .then((response) => {
-      res.setHeader('Content-Type', response.headers['content-type']);
-      res.setHeader('Content-Disposition', 'inline');
-      response.data.pipe(res);
-    })
-    .catch((error) => {
-      console.error('Error fetching the image:', (error as Error).message);
-      res.status(500).json({ error: 'Failed to proxy image' });
-    });
-});
-
-router.get('/m3u8', async (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   const { url, ref } = req.query;
 
   if (!url || typeof url !== 'string') {
@@ -34,27 +27,47 @@ router.get('/m3u8', async (req: Request, res: Response) => {
   }
 
   try {
-    const response = await axios.get(url, {
-      headers: {
-        'Referer': ref as string || '',
-      },
+    const response = await axios({
+      method: 'get',
+      url,
+      responseType: 'stream',
+      headers: ref ? { Referer: ref as string } : {},
     });
 
-    let m3u8Content = response.data as string;
-    
-    // if you try to use localhost, You will not have a good time
-    const baseUrl = `https://${req.get('host')}/fetch/segment?url=`;
+    const contentType = response.headers['content-type'];
 
-    m3u8Content = m3u8Content.replace(/(.*\.ts)/g, (match) => {
-      return baseUrl + encodeURIComponent(new URL(match, url).href);
-    });
+    if (!supported_types.includes(contentType)) {
+      return res.status(415).json({ error: 'Unsupported media type' });
+    }
 
-    res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+    if (contentType.includes('application/vnd.apple.mpegurl')) {
+      let m3u8Content = '';
+
+      response.data.on('data', (chunk: Buffer) => {
+        m3u8Content += chunk.toString();
+      });
+
+      response.data.on('end', () => {
+        const baseUrl = `https://${req.get('host')}/fetch/segment?url=`;
+        m3u8Content = m3u8Content.replace(/(.*\.ts)/g, (match) => {
+          return baseUrl + encodeURIComponent(new URL(match, url).href);
+        });
+
+        res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+        res.setHeader('Content-Disposition', 'inline');
+        res.send(m3u8Content);
+      });
+
+      return;
+    }
+
+    response.data.pipe(res);
+    res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Disposition', 'inline');
-    res.send(m3u8Content);
+
   } catch (error) {
-    console.error('Error fetching the m3u8 file:', (error as Error).message);
-    res.status(500).json({ error: 'Failed to proxy m3u8 file' });
+    console.error('Error fetching the content:', (error as Error).message);
+    res.status(500).json({ error: 'Failed to proxy content' });
   }
 });
 
@@ -72,9 +85,9 @@ router.get('/segment', async (req: Request, res: Response) => {
       responseType: 'arraybuffer',
     });
 
-    res.setHeader('Content-Type', 'video/MP2T');
+    const contentType = response.headers['content-type'] || 'application/octet-stream';
+    res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Disposition', 'inline');
-    // send keep-alive header cuz mpv was complaining about it
     res.setHeader('Connection', 'Keep-Alive');
     res.send(response.data);
   } catch (error) {
