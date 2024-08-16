@@ -3,6 +3,25 @@ import axios from 'axios';
 
 const router = Router();
 
+router.get('/image', (req: Request, res: Response) => {
+  const { url } = req.query;
+
+  if (!url || typeof url !== 'string') {
+    return res.status(400).json({ error: 'No URL provided' });
+  }
+
+  axios({
+    method: 'get',
+    url,
+    responseType: 'stream',
+  }).then((response) => {
+    response.data.pipe(res);
+  }).catch((error) => {
+    console.error('Error fetching the image:', (error as Error).message);
+    res.status(500).json({ error: 'Failed to proxy image' });
+  });
+});
+
 router.get('/m3u8', async (req: Request, res: Response) => {
   const { url, ref } = req.query;
 

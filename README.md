@@ -16,10 +16,16 @@ This proxy is only for m3u8 files, i might add support for other file types in t
 
 ## Try it out
 
-You can try out the proxy server by making a request to the following URL:
+You can try out the proxy by making a request to the following URL:
 
 ```
 https://renewed-georgeanne-nekonode-1aa70c0c.koyeb.app/fetch/m3u8?url=https://example.com/playlist.m3u8
+```
+
+Using this for Images:
+
+```
+https://renewed-georgeanne-nekonode-1aa70c0c.koyeb.app/fetch/image?url=https://gogocdn.net/cover/dead-dead-demons-dededede-destruction.png
 ```
 
 ## Deployment 
