@@ -24,6 +24,7 @@ router.get('/', (req: Request, res: Response) => {
           url: 'The URL of the video segment.'
         }
       },
+      /// added
       {
         method: 'GET',
         usage: '/health',
