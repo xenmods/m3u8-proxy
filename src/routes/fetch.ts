@@ -36,7 +36,7 @@ router.get('/', async (req: Request, res: Response) => {
       });
 
       response.data.on('end', () => {
-        const baseUrl = `https://${req.get('host')}/fetch/segment?url=`;
+        const baseUrl = `http://${req.get('host')}/fetch/segment?url=`;
         m3u8Content = m3u8Content.replace(/(.*\.ts)/g, (match) => {
           return baseUrl + encodeURIComponent(new URL(match, url).href);
         });

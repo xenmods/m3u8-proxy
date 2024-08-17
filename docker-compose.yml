@@ -6,17 +6,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000 # Edit as needed (edit the port in dockerfile too)
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
     ports:
       - "3000:3000" # Expose the app on port 3000, edit as needed(edit the port in dockerfile too)
     volumes:
       - .:/app
     command: ["bun", "start"]
-    depends_on:
-      - redis
-
-  redis:
-    image: "redis:alpine"
-    ports:
-      - "6379:6379"
