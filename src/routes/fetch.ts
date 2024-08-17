@@ -55,7 +55,13 @@ router.get('/', async (req: Request, res: Response) => {
     res.setHeader('Content-Disposition', 'inline');
 
   } catch (error) {
-    console.error('Error fetching the content:', (error as Error).message);
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error details:', {
+        message: error.message,
+        response: error.response?.data,
+        headers: error.config?.headers ?? {},
+      });
+    }
     res.status(500).json({ error: 'Failed to proxy content' });
   }
 });
@@ -85,7 +91,13 @@ router.get('/segment', async (req: Request, res: Response) => {
     res.setHeader('Connection', 'Keep-Alive');
     res.send(response.data);
   } catch (error) {
-    console.error('Error fetching the video segment:', (error as Error).message);
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error details:', {
+        message: error.message,
+        response: error.response?.data,
+        headers: error.config?.headers ?? {},
+      });
+    }
     res.status(500).json({ error: 'Failed to proxy video segment' });
   }
 });
