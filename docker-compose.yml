@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3000 # You can change the port as needed, edit the Dockerfile as well
+    ports:
+      - "3000:3000" # You can change the port as needed, edit the Dockerfile as well
+    volumes:
+      - .:/app
+    command: ["bun", "start"]
