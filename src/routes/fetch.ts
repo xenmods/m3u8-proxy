@@ -37,7 +37,7 @@ router.get('/', async (req: Request, res: Response) => {
       });
 
       response.data.on('end', () => {
-        // forgot about this after testing lol.
+        // this does not work with master urls (yet), I did start testing itbut for now I will not add tha till I get some sleep
         const baseUrl = `https://${req.get('host')}/fetch/segment?url=`;
         m3u8Content = m3u8Content.replace(/(.*\.ts)/g, (match) => {
           return baseUrl + encodeURIComponent(new URL(match, url).href);
