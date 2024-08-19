@@ -24,7 +24,8 @@ router.get('/', async (req: Request, res: Response) => {
 
     const contentType = response.headers['content-type'];
 
-    if (!supported_types.includes(contentType)) {
+    // fixed the issue with the content type not being detected
+    if (!supported_types.some((type) => contentType?.startsWith(type))) {
       return res.status(415).json({ error: 'Unsupported media type' });
     }
 
