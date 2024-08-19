@@ -17,7 +17,7 @@ app.use(cors({
 app.use(morgan('combined'));
 
 app.use('/', indexRouter);
-// had to rename as my host does not support fetch as a route
+// had to rename as my host does not support proxy as a route
 app.use('/fetch', proxyRouter);
 
 const PORT = process.env.PORT || 3000;
