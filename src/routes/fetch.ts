@@ -3,8 +3,6 @@ import axios from 'axios';
 import https from 'https';
 import supported_types from '../config/supported_types.json';
 
-// rewriting this code was an absolute pain, I'll probably do it again later aa.
-
 const router = Router();
 
 router.get('/', async (req: Request, res: Response) => {
@@ -15,46 +13,57 @@ router.get('/', async (req: Request, res: Response) => {
   }
 
   try {
+    const headResponse = await axios.head(url, {
+      headers: ref ? { Referer: ref as string } : {},
+    });
+    const contentType = headResponse.headers['content-type'];
+
+    const responseType = contentType?.startsWith('image/') ? 'arraybuffer' : 'text';
+
     const response = await axios({
       method: 'get',
       url,
-      responseType: 'stream',
+      responseType: responseType, 
       headers: ref ? { Referer: ref as string } : {},
     });
 
-    const contentType = response.headers['content-type'];
-
-    // fixed the issue with the content type not being detected
     if (!supported_types.some((type) => contentType?.startsWith(type))) {
       return res.status(415).json({ error: 'Unsupported media type' });
     }
 
     if (contentType.includes('application/vnd.apple.mpegurl')) {
-      let m3u8Content = '';
+      let m3u8Content = response.data.toString('utf-8'); 
 
-      response.data.on('data', (chunk: Buffer) => {
-        m3u8Content += chunk.toString();
+      const baseFetchUrl = `https://${req.get('host')}/fetch?url=`;
+      const baseSegmentUrl = `https://${req.get('host')}/fetch/segment?url=`;
+
+      m3u8Content = m3u8Content.replace(/([^\s]+\.ts)/g, (match: string) => {
+        const absoluteUrl = new URL(match, url).href;
+        return `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
       });
 
-      response.data.on('end', () => {
-        // this does not work with master urls (yet), I did start testing itbut for now I will not add tha till I get some sleep.
-        const baseUrl = `https://${req.get('host')}/fetch/segment?url=`;
-        m3u8Content = m3u8Content.replace(/(.*\.ts)/g, (match) => {
-          return baseUrl + encodeURIComponent(new URL(match, url).href);
-        });
-
-        res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
-        res.setHeader('Content-Disposition', 'inline');
-        res.setHeader('Connection', 'Keep-Alive');
-        res.send(m3u8Content);
+      m3u8Content = m3u8Content.replace(/([^\s]+\.m3u8)/g, (match: string) => {
+        const absoluteUrl = new URL(match, url).href;
+        return `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
       });
 
+      res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+      res.setHeader('Content-Disposition', 'inline');
+      res.setHeader('Connection', 'Keep-Alive');
+      res.send(m3u8Content);
       return;
     }
 
-    response.data.pipe(res);
-    res.setHeader('Content-Type', contentType);
-    res.setHeader('Content-Disposition', 'inline');
+    if (responseType === 'arraybuffer') {
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', 'inline');
+      res.setHeader('Connection', 'Keep-Alive');
+      res.send(response.data);
+    } else {
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', 'inline');
+      response.data.pipe(res);
+    }
 
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -81,13 +90,12 @@ router.get('/segment', async (req: Request, res: Response) => {
       url,
       responseType: 'arraybuffer',
       headers: {
-        'Connection': 'keep-alive'
+        'Connection': 'keep-alive',
       },
-      // keep-alive is required for video segments
-      httpsAgent: new https.Agent({ keepAlive: true })
+      httpsAgent: new https.Agent({ keepAlive: true }),
     });
 
-    const contentType = response.headers['content-type'] || 'application/octet-stream';
+    const contentType = response.headers['content-type'] || 'video/MP2T'; 
     res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Disposition', 'inline');
     res.setHeader('Connection', 'Keep-Alive');

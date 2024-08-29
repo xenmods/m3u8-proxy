@@ -16,5 +16,7 @@
     "audio/mpeg",
     "audio/ogg",
     "audio/wav",
-    "audio/webm"
+    "audio/webm",
+    "video/MP2T",
+    "video/mp2t"
 ]
