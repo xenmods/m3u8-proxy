@@ -43,20 +43,31 @@ router.get('/', async (req: Request, res: Response) => {
     });
     const contentType = headResponse.headers['content-type'];
 
-    const responseType = contentType?.startsWith('image/') ? 'arraybuffer' : 'text';
+    const responseType =
+      contentType?.startsWith('image/') || contentType?.includes('arraybuffer')
+        ? 'arraybuffer'
+        : contentType?.includes('json')
+        ? 'json'
+        : 'text';
 
     const response = await axios({
       method: 'get',
       url,
-      responseType: responseType, 
+      responseType: responseType,
       headers: ref ? { Referer: ref as string } : {},
     });
+
+    // if text/plain or application/json, return as json
+    if (responseType === 'json') {
+      res.json(response.data);
+      return;
+    }
 
     if (contentType.includes('application/vnd.apple.mpegurl')) {
       let m3u8Content = response.data.toString('utf-8'); 
 
-      const baseFetchUrl = `https://${req.get('host')}/fetch?url=`;
-      const baseSegmentUrl = `https://${req.get('host')}/fetch/segment?url=`;
+      const baseFetchUrl = `http://${req.get('host')}/fetch?url=`;
+      const baseSegmentUrl = `http://${req.get('host')}/fetch/segment?url=`;
 
       m3u8Content = m3u8Content.replace(/([^\s]+\.ts)/g, (match: string) => {
         const absoluteUrl = new URL(match, url).href;
@@ -75,17 +86,11 @@ router.get('/', async (req: Request, res: Response) => {
       return;
     }
 
-    if (responseType === 'arraybuffer') {
-      res.setHeader('Content-Type', contentType);
-      res.setHeader('Content-Disposition', 'inline');
-      res.setHeader('Connection', 'Keep-Alive');
-      res.send(response.data);
-    } else {
-      res.setHeader('Content-Type', contentType);
-      res.setHeader('Content-Disposition', 'inline');
-      response.data.pipe(res);
-    }
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', 'inline');
 
+    // pass through the content
+    res.send(response.data);
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error('Axios error details:', {
