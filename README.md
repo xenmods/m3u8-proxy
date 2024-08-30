@@ -6,7 +6,7 @@
 
 I run a few free instances of this proxy server. You can use them for free. Here are the links:
 
-[Koyeb](https://renewed-georgeanne-nekonode-1aa70c0c.koyeb.app/), You can also deploy your own instance on Koyeb by clicking the button below.
+[Koyeb](https://renewed-georgeanne-nekonode-1aa70c0c.koyeb.app/), You can also deploy your own instance on Koyeb by clicking the button below. (Broken rn)
 
 [Mail-Hook](https://proxy.mail-hook.com/), This is an old domain that I own. You can use it for free.
 
@@ -27,13 +27,13 @@ This proxy will work for most M3U8 files, but it may not work for all. If you en
 You can try out the proxy by making a request to the following URL:
 
 ```
-https://renewed-georgeanne-nekonode-1aa70c0c.koyeb.app/fetch/?url=https://example.com/playlist.m3u8
+https://proxy.mail-hook.com/fetch/?url=https://example.com/playlist.m3u8
 ```
 
 Using this for Images:
 
 ```
-https://renewed-georgeanne-nekonode-1aa70c0c.koyeb.app/fetch/?url=https://gogocdn.net/cover/dead-dead-demons-dededede-destruction.png
+https://proxy.mail-hook.com/fetch/?url=https://gogocdn.net/cover/dead-dead-demons-dededede-destruction.png
 ```
 
 # Note
