@@ -66,8 +66,9 @@ router.get('/', async (req: Request, res: Response) => {
     if (contentType.includes('application/vnd.apple.mpegurl')) {
       let m3u8Content = response.data.toString('utf-8'); 
 
-      const baseFetchUrl = `http://${req.get('host')}/fetch?url=`;
-      const baseSegmentUrl = `http://${req.get('host')}/fetch/segment?url=`;
+      /// i forgor 😭
+      const baseFetchUrl = `https://${req.get('host')}/fetch?url=`;
+      const baseSegmentUrl = `https://${req.get('host')}/fetch/segment?url=`;
 
       m3u8Content = m3u8Content.replace(/([^\s]+\.ts)/g, (match: string) => {
         const absoluteUrl = new URL(match, url).href;
