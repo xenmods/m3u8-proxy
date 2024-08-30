@@ -1,7 +1,6 @@
 import { Router, type Request, type Response } from 'express';
 import axios from 'axios';
 import https from 'https';
-import supported_types from '../config/supported_types.json';
 
 const router = Router();
 
@@ -10,6 +9,32 @@ router.get('/', async (req: Request, res: Response) => {
 
   if (!url || typeof url !== 'string') {
     return res.status(400).json({ error: 'No URL provided' });
+  }
+
+  // if vtt file, return it directly
+  if (url.endsWith('.vtt')) {
+    try {
+      const response = await axios({
+        method: 'get',
+        url,
+        responseType: 'arraybuffer',
+        headers: ref ? { Referer: ref as string } : {},
+      });
+
+      res.setHeader('Content-Type', 'text/vtt');
+      res.setHeader('Content-Disposition', 'inline');
+      res.send(response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error details:', {
+          message: error.message,
+          response: error.response?.data,
+          headers: error.config?.headers ?? {},
+        });
+      }
+      res.status(500).json({ error: 'Failed to proxy content' });
+    }
+    return;
   }
 
   try {
@@ -26,10 +51,6 @@ router.get('/', async (req: Request, res: Response) => {
       responseType: responseType, 
       headers: ref ? { Referer: ref as string } : {},
     });
-
-    if (!supported_types.some((type) => contentType?.startsWith(type))) {
-      return res.status(415).json({ error: 'Unsupported media type' });
-    }
 
     if (contentType.includes('application/vnd.apple.mpegurl')) {
       let m3u8Content = response.data.toString('utf-8'); 
