@@ -5,7 +5,7 @@ const router = Router();
 router.get('/', (req: Request, res: Response) => {
   res.json(
   { 
-    message: 'NekoProxy is ready🎉',
+    message: 'NekoProxyV2 is ready🎉',
     endpoints: [
       {
         method: 'GET',
