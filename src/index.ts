@@ -7,6 +7,8 @@ import proxyRouter from './routes/fetch.ts';
 
 const app = express();
 
+app.use(express.json());
+
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
