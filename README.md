@@ -6,7 +6,7 @@
 
 I run a few free instances of this proxy server. You can use them for free. Here are the links:
 
-[Koyeb](https://renewed-georgeanne-nekonode-1aa70c0c.koyeb.app/), You can also deploy your own instance on Koyeb by clicking the button below. (Broken rn)
+[Koyeb](https://renewed-georgeanne-nekonode-1aa70c0c.koyeb.app/), You can also deploy your own instance on Koyeb by clicking the button below.
 
 [Mail-Hook](https://proxy.mail-hook.com/), This is an old domain that I own. You can use it for free.
 
