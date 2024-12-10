@@ -11,6 +11,8 @@ router.get('/', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'No URL provided' });
   }
 
+  console.log(`[PROXY] Getting URL: ${url} with ref: ${ref}`)
+
   // if vtt file, return it directly
   if (url.endsWith('.vtt')) {
     try {
