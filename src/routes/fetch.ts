@@ -59,6 +59,8 @@ router.get('/', async (req: Request, res: Response) => {
       headers: ref ? { Referer: ref as string } : {},
     });
 
+    console.log(`[RESPONSE] ${response.data}}`)
+
     // if text/plain or application/json, return as json
     if (responseType === 'json') {
       res.json(response.data);
