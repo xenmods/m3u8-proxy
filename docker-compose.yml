@@ -5,9 +5,9 @@ services:
       dockerfile: Dockerfile
     environment:
       - NODE_ENV=production
-      - PORT=3000 # Edit as needed (edit the port in dockerfile too)
+      - PORT=4000 # Updated to match the port in the Dockerfile
     ports:
-      - "3000:3000" # Expose the app on port 3000, edit as needed(edit the port in dockerfile too)
+      - "4000:4000" # Updated to expose the app on port 4000
     volumes:
       - .:/app
     command: ["bun", "start"]
