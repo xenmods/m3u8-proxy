@@ -13,37 +13,7 @@ router.use((req, res, next) => {
 router.get('/', (req: Request, res: Response) => {
   res.json(
   { 
-    message: 'NekoProxyV2 is ready🎉',
-    endpoints: [
-      {
-        method: 'GET',
-        usage: '/fetch',
-        description: 'Fetch a video stream from a URL',
-        query: {
-          url: 'The URL of the video or image.',
-          ref: 'The referrer URL'
-        },
-        note: "Please use this to fetch m3u8 files and images, it doesn't really work for whole websites."
-      },
-      {
-        method: 'GET',
-        usage: '/fetch/segment',
-        description: 'Fetch a video segment from a URL',
-        query: {
-          url: 'The URL of the video segment.'
-        }
-      },
-      {
-        method: 'GET',
-        usage: '/health',
-        description: 'Check the health status of the server'
-      },
-      {
-        method: 'GET',
-        usage: '/reqs',
-        description: 'Check the total number of requests made to the server(Resets every time the server restarts)'
-      }
-    ]
+    message: 'Portal for the realms.',
    }
   );
 });
