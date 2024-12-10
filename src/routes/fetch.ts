@@ -149,13 +149,7 @@ router.get('/segment', async (req: Request, res: Response) => {
     
     // finally there is also a mon.key file which we need to proxy
     let final = response.data
-    final = final.replace(/([^\s]+\.key)/g, (match: string) => {
-      const absoluteUrl = new URL(match, url).href;
-      const baseFetchUrl = `https://${req.get('host')}/fetch?url=`;
-      return `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
-    });
 
-    // pass through the content
     res.send(final);
   } catch (error) {
     if (axios.isAxiosError(error)) {
