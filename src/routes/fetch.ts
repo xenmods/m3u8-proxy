@@ -1,169 +1,3 @@
-// import { Router, type Request, type Response } from 'express';
-// import axios from 'axios';
-// import https from 'https';
-
-// const router = Router();
-
-// router.get('/', async (req: Request, res: Response) => {
-//   const { url, ref } = req.query;
-
-//   if (!url || typeof url !== 'string') {
-//     return res.status(400).json({ error: 'No URL provided' });
-//   }
-
-//   console.log(`[PROXY] Getting URL: ${url} with ref: ${ref}`)
-
-//   // if vtt file, return it directly
-//   if (url.endsWith('.vtt')) {
-//     try {
-//       const response = await axios({
-//         method: 'get',
-//         url,
-//         responseType: 'arraybuffer',
-//         headers: ref ? { Referer: ref as string } : {},
-//       });
-
-//       res.setHeader('Content-Type', 'text/vtt');
-//       res.setHeader('Content-Disposition', 'inline');
-//       res.send(response.data);
-//     } catch (error) {
-//       if (axios.isAxiosError(error)) {
-//         console.error('Axios error details:', {
-//           message: error.message,
-//           response: error.response?.data,
-//           headers: error.config?.headers ?? {},
-//         });
-//       }
-//       res.status(500).json({ error: 'Failed to proxy content' });
-//     }
-//     return;
-//   }
-
-//   try {
-//     const headResponse = await axios.head(url, {
-//       headers: ref ? { Referer: ref as string } : {},
-//     });
-//     const contentType = headResponse.headers['content-type'];
-
-//     const responseType =
-//       contentType?.startsWith('image/') || contentType?.includes('arraybuffer')
-//         ? 'arraybuffer'
-//         : contentType?.includes('json')
-//         ? 'json'
-//         : 'text';
-
-//     const response = await axios({
-//       method: 'get',
-//       url,
-//       responseType: responseType,
-//       headers: ref ? { Referer: ref as string } : {},
-//     });
-
-//     console.log(`[RESPONSE] ${response.data}}`)
-
-//     // if text/plain or application/json, return as json
-//     if (responseType === 'json') {
-//       res.json(response.data);
-//       return;
-//     }
-
-//     if (contentType.includes('application/vnd.apple.mpegurl')) {
-//       let m3u8Content = response.data.toString('utf-8'); 
-
-//       /// i forgor 😭
-//       const baseFetchUrl = `https://${req.get('host')}/fetch?url=`;
-//       const baseSegmentUrl = `https://${req.get('host')}/fetch/segment?url=`;
-
-//       m3u8Content = m3u8Content.replace(/([^\s]+\.ts)/g, (match: string) => {
-//         const absoluteUrl = new URL(match, url).href;
-//         return `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
-//       });
-
-//       m3u8Content = m3u8Content.replace(/([^\s]+\.m3u8)/g, (match: string) => {
-//         const absoluteUrl = new URL(match, url).href;
-//         return `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
-//       });
-
-//       // there will also be .jpg segments. so we replace those (animepahe specifically)
-//       m3u8Content = m3u8Content.replace(/([^\s]+\.jpg)/g, (match: string) => {
-//         const absoluteUrl = new URL(match, url).href;
-//         return `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
-//       });
-
-
-
-//       res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
-//       res.setHeader('Content-Disposition', 'inline');
-//       res.setHeader('Connection', 'Keep-Alive');
-//       res.send(m3u8Content);
-//       return;
-//     }
-
-//     res.setHeader('Content-Type', contentType);
-//     res.setHeader('Content-Disposition', 'inline');
-
-//     // finally there is also a mon.key file which we need to proxy
-//     let final = response.data
-//     final = final.replace(/([^\s]+\.key)/g, (match: string) => {
-//       const absoluteUrl = new URL(match, url).href;
-//       const baseFetchUrl = `https://${req.get('host')}/fetch?url=`;
-//       return `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
-//     });
-
-//     // pass through the content
-//     res.send(final);
-//   } catch (error) {
-//     if (axios.isAxiosError(error)) {
-//       console.error('Axios error details:', {
-//         message: error.message,
-//         response: error.response?.data,
-//         headers: error.config?.headers ?? {},
-//       });
-//     }
-//     res.status(500).json({ error: 'Failed to proxy content' });
-//   }
-// });
-
-// router.get('/segment', async (req: Request, res: Response) => {
-//   const { url } = req.query;
-
-//   if (!url || typeof url !== 'string') {
-//     return res.status(400).json({ error: 'No URL provided' });
-//   }
-
-//   try {
-//     const response = await axios({
-//       method: 'get',
-//       url,
-//       responseType: 'arraybuffer',
-//       headers: {
-//         'Connection': 'keep-alive',
-//       },
-//       httpsAgent: new https.Agent({ keepAlive: true }),
-//     });
-
-//     const contentType = response.headers['content-type'] || 'video/MP2T'; 
-//     res.setHeader('Content-Type', contentType);
-//     res.setHeader('Content-Disposition', 'inline');
-//     res.setHeader('Connection', 'Keep-Alive');
-    
-//     // finally there is also a mon.key file which we need to proxy
-//     let final = response.data
-
-//     res.send(final);
-//   } catch (error) {
-//     if (axios.isAxiosError(error)) {
-//       console.error('Axios error details:', {
-//         message: error.message,
-//         response: error.response?.data,
-//         headers: error.config?.headers ?? {},
-//       });
-//     }
-//     res.status(500).json({ error: 'Failed to proxy video segment' });
-//   }
-// });
-
-// export default router;
 import { Router, type Request, type Response } from 'express';
 import axios from 'axios';
 import https from 'https';
@@ -177,8 +11,9 @@ router.get('/', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'No URL provided' });
   }
 
-  console.log(`[PROXY] Getting URL: ${url} with ref: ${ref}`);
+  console.log(`[PROXY] Getting URL: ${url} with ref: ${ref}`)
 
+  // if vtt file, return it directly
   if (url.endsWith('.vtt')) {
     try {
       const response = await axios({
@@ -192,12 +27,19 @@ router.get('/', async (req: Request, res: Response) => {
       res.setHeader('Content-Disposition', 'inline');
       res.send(response.data);
     } catch (error) {
-      console.error('Failed to proxy VTT content:', error);
-      res.status(500).json({ error: 'Failed to proxy VTT content' });
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error details:', {
+          message: error.message,
+          response: error.response?.data,
+          headers: error.config?.headers ?? {},
+        });
+      }
+      res.status(500).json({ error: 'Failed to proxy content' });
     }
     return;
   }
 
+  // if .key file return it directly
   if (url.endsWith('.key')) {
     try {
       const response = await axios({
@@ -211,8 +53,14 @@ router.get('/', async (req: Request, res: Response) => {
       res.setHeader('Content-Disposition', 'inline');
       res.send(response.data);
     } catch (error) {
-      console.error('Failed to proxy key content:', error);
-      res.status(500).json({ error: 'Failed to proxy key content' });
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error details:', {
+          message: error.message,
+          response: error.response?.data,
+          headers: error.config?.headers ?? {},
+        });
+      }
+      res.status(500).json({ error: 'Failed to proxy content' });
     }
     return;
   }
@@ -237,44 +85,73 @@ router.get('/', async (req: Request, res: Response) => {
       headers: ref ? { Referer: ref as string } : {},
     });
 
+    console.log(`[RESPONSE] ${response.data}}`)
+
+    // if text/plain or application/json, return as json
     if (responseType === 'json') {
       res.json(response.data);
       return;
     }
 
     if (contentType.includes('application/vnd.apple.mpegurl')) {
-      let m3u8Content = response.data.toString('utf-8');
-      // req.host = 'https://automatic-winner-74459g47jp3pjgr-3000.app.github.dev/' // for development
+      let m3u8Content = response.data.toString('utf-8'); 
+
+      /// i forgor 😭
       const baseFetchUrl = `https://${req.get('host')}/fetch?url=`;
       const baseSegmentUrl = `https://${req.get('host')}/fetch/segment?url=`;
-      // const baseFetchUrl = `https://automatic-winner-74459g47jp3pjgr-3000.app.github.dev/fetch?url=`;
-      // const baseSegmentUrl = `https://automatic-winner-74459g47jp3pjgr-3000.app.github.dev/fetch/segment?url=`;
 
-      m3u8Content = m3u8Content.replace(/([^\s]+\.(ts|m3u8|jpg|key))/g, (match: string) => {
+      m3u8Content = m3u8Content.replace(/([^\s]+\.ts)/g, (match: string) => {
         const absoluteUrl = new URL(match, url).href;
         return `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
       });
-      // for development
-      // m3u8Content.replaceAll('https://localhost:3000', 'https://automatic-winner-74459g47jp3pjgr-3000.app.github.dev')
+
+      m3u8Content = m3u8Content.replace(/([^\s]+\.m3u8)/g, (match: string) => {
+        const absoluteUrl = new URL(match, url).href;
+        return `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
+      });
+
+      // there will also be .jpg segments. so we replace those (animepahe specifically)
+      m3u8Content = m3u8Content.replace(/([^\s]+\.jpg)/g, (match: string) => {
+        const absoluteUrl = new URL(match, url).href;
+        return `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
+      });
+
+
 
       res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
       res.setHeader('Content-Disposition', 'inline');
+      res.setHeader('Connection', 'Keep-Alive');
       res.send(m3u8Content);
-      console.log(m3u8Content)
       return;
     }
 
     res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Disposition', 'inline');
-    res.send(response.data);
+
+    // finally there is also a mon.key file which we need to proxy
+    let final = response.data
+    final = final.replace(/([^\s]+\.key)/g, (match: string) => {
+      const absoluteUrl = new URL(match, url).href;
+      const baseFetchUrl = `https://${req.get('host')}/fetch?url=`;
+      return `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
+    });
+
+    // pass through the content
+    res.send(final);
   } catch (error) {
-    console.error('Failed to proxy content:', error);
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error details:', {
+        message: error.message,
+        response: error.response?.data,
+        headers: error.config?.headers ?? {},
+      });
+    }
     res.status(500).json({ error: 'Failed to proxy content' });
   }
 });
 
 router.get('/segment', async (req: Request, res: Response) => {
-  const { url, ref } = req.query;
+  const { url } = req.query;
 
   if (!url || typeof url !== 'string') {
     return res.status(400).json({ error: 'No URL provided' });
@@ -286,19 +163,28 @@ router.get('/segment', async (req: Request, res: Response) => {
       url,
       responseType: 'arraybuffer',
       headers: {
-        ...(ref ? { Referer: ref as string } : {}),
-        Connection: 'keep-alive',
+        'Connection': 'keep-alive',
       },
       httpsAgent: new https.Agent({ keepAlive: true }),
     });
 
-    const contentType = response.headers['content-type'] || 'video/MP2T';
+    const contentType = response.headers['content-type'] || 'video/MP2T'; 
     res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Disposition', 'inline');
     res.setHeader('Connection', 'Keep-Alive');
-    res.send(response.data);
+    
+    // finally there is also a mon.key file which we need to proxy
+    let final = response.data
+
+    res.send(final);
   } catch (error) {
-    console.error('Failed to proxy video segment:', error);
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error details:', {
+        message: error.message,
+        response: error.response?.data,
+        headers: error.config?.headers ?? {},
+      });
+    }
     res.status(500).json({ error: 'Failed to proxy video segment' });
   }
 });
