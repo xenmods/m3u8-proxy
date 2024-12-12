@@ -245,10 +245,10 @@ router.get('/', async (req: Request, res: Response) => {
     if (contentType.includes('application/vnd.apple.mpegurl')) {
       let m3u8Content = response.data.toString('utf-8');
       // req.host = 'https://automatic-winner-74459g47jp3pjgr-3000.app.github.dev/' // for development
-      // const baseFetchUrl = `https://${req.get('host')}/fetch?url=`;
-      // const baseSegmentUrl = `https://${req.get('host')}/fetch/segment?url=`;
-      const baseFetchUrl = `https://automatic-winner-74459g47jp3pjgr-3000.app.github.dev/fetch?url=`;
-      const baseSegmentUrl = `https://automatic-winner-74459g47jp3pjgr-3000.app.github.dev/fetch/segment?url=`;
+      const baseFetchUrl = `https://${req.get('host')}/fetch?url=`;
+      const baseSegmentUrl = `https://${req.get('host')}/fetch/segment?url=`;
+      // const baseFetchUrl = `https://automatic-winner-74459g47jp3pjgr-3000.app.github.dev/fetch?url=`;
+      // const baseSegmentUrl = `https://automatic-winner-74459g47jp3pjgr-3000.app.github.dev/fetch/segment?url=`;
 
       m3u8Content = m3u8Content.replace(/([^\s]+\.(ts|m3u8|jpg|key))/g, (match: string) => {
         const absoluteUrl = new URL(match, url).href;
