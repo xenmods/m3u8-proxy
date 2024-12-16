@@ -102,18 +102,30 @@ router.get('/', async (req: Request, res: Response) => {
 
       m3u8Content = m3u8Content.replace(/([^\s]+\.ts)/g, (match: string) => {
         const absoluteUrl = new URL(match, url).href;
-        return `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
+        let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
+        if (ref) {
+          final = `${final}&ref=${encodeURIComponent(ref)}`
+        }
+        return final
       });
 
       m3u8Content = m3u8Content.replace(/([^\s]+\.m3u8)/g, (match: string) => {
         const absoluteUrl = new URL(match, url).href;
-        return `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
+        let final = `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
+        if (ref) {
+          final = `${final}&ref=${encodeURIComponent(ref)}`
+        }
+        return final
       });
 
       // there will also be .jpg segments. so we replace those (animepahe specifically)
       m3u8Content = m3u8Content.replace(/([^\s]+\.jpg)/g, (match: string) => {
         const absoluteUrl = new URL(match, url).href;
-        return `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
+        let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
+        if (ref) {
+          final = `${final}&ref=${encodeURIComponent(ref)}`
+        }
+        return final
       });
 
 
@@ -133,7 +145,11 @@ router.get('/', async (req: Request, res: Response) => {
     final = final.replace(/([^\s]+\.key)/g, (match: string) => {
       const absoluteUrl = new URL(match, url).href;
       const baseFetchUrl = `https://${req.get('host')}/fetch?url=`;
-      return `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
+      let final = `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
+        if (ref) {
+          final = `${final}&ref=${encodeURIComponent(ref)}`
+        }
+        return final
     });
 
     // pass through the content
