@@ -100,14 +100,6 @@ router.get('/', async (req: Request, res: Response) => {
       const baseFetchUrl = `https://${req.get('host')}/fetch?url=`;
       const baseSegmentUrl = `https://${req.get('host')}/fetch/segment?url=`;
 
-      m3u8Content = m3u8Content.replace(/URI="([^"]+)"/g, (match, capturedUrl) => {
-        const absoluteUrl = new URL(capturedUrl, url).href;
-        let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
-        if (ref) {
-          final = `${final}&ref=${encodeURIComponent(ref)}`;
-        }
-        return `URI="${final}"`; // Re-insert the modified URL back in place.
-      });;
 
       m3u8Content = m3u8Content.replace(/([^\s]+\.m3u8)/g, (match: string) => {
         const absoluteUrl = new URL(match, url).href;
@@ -129,15 +121,15 @@ router.get('/', async (req: Request, res: Response) => {
       });
 
       // there also will be .key files (mon.key)
-      m3u8Content = m3u8Content.replace(/([^\s]+\.key)/g, (match: string) => {
-        const absoluteUrl = new URL(match, url).href;
+      m3u8Content = m3u8Content.replace(/URI="([^"]+)"/g, (match) => {
+        match = match.replaceAll(`URI="`, ``).replaceAll(`"`, ``)
+        const absoluteUrl = new URL(match).href;
         let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
         if (ref) {
           final = `${final}&ref=${encodeURIComponent(ref)}`
         }
         return final
       });
-
 
 
       res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
