@@ -131,6 +131,17 @@ router.get('/', async (req: Request, res: Response) => {
         return `URI="${final}"`
       });
 
+      // finally, gogoanime m3u8 segments start from ep*, so we replace it with OUR_URL/ep*
+      m3u8Content =  m3u8Content
+      .split('\n')
+      .map(line => {
+        if (line.startsWith('ep')) {
+          return `${baseSegmentUrl}${line}`;
+        }
+        return line;
+      })
+      .join('\n');
+
 
       res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
       res.setHeader('Content-Disposition', 'inline');
