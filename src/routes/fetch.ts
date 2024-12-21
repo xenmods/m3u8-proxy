@@ -193,18 +193,20 @@ router.get("/", async (req: Request, res: Response) => {
 });
 
 router.get("/segment", async (req: Request, res: Response) => {
-  const { url } = req.query;
+  const { url, ref } = req.query;
 
   if (!url || typeof url !== "string") {
     return res.status(400).json({ error: "No URL provided" });
   }
 
   try {
+    let headers = ref ? { Referer: ref as string } : {};
     const response = await axios({
       method: "get",
       url,
       responseType: "arraybuffer",
       headers: {
+        ...headers,
         Connection: "keep-alive",
       },
       httpsAgent: new https.Agent({ keepAlive: true }),
@@ -220,6 +222,7 @@ router.get("/segment", async (req: Request, res: Response) => {
 
     res.send(final);
   } catch (error) {
+    console.log(`[ERROR] ${error}`);
     if (axios.isAxiosError(error)) {
       console.error("Axios error details:", {
         message: error.message,
