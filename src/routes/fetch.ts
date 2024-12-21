@@ -143,6 +143,19 @@ router.get("/", async (req: Request, res: Response) => {
         })
         .join("\n");
 
+      // lastly animez m3u8 segments start from playlist*, so we replace it with OUR_URL/playlist*
+      m3u8Content = m3u8Content
+        .split("\n")
+        .map((line) => {
+          if (line.startsWith("playlist")) {
+            return `${baseSegmentUrl}${encodeURIComponent(
+              url.split("/playlist")[0]
+            )}/${line}`;
+          }
+          return line;
+        })
+        .join("\n");
+
       res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
       res.setHeader("Content-Disposition", "inline");
       res.setHeader("Connection", "Keep-Alive");
