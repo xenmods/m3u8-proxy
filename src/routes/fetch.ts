@@ -11,8 +11,6 @@ router.get("/", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "No URL provided" });
   }
 
-  console.log(`[PROXY] Getting URL: ${url} with ref: ${ref}`);
-
   // if vtt file, return it directly
   if (url.endsWith(".vtt")) {
     try {
@@ -27,6 +25,8 @@ router.get("/", async (req: Request, res: Response) => {
       res.setHeader("Content-Disposition", "inline");
       res.send(response.data);
     } catch (error) {
+      console.clear();
+      console.log(`[ERROR] ${error}`);
       if (axios.isAxiosError(error)) {
         console.error("Axios error details:", {
           message: error.message,
@@ -53,6 +53,7 @@ router.get("/", async (req: Request, res: Response) => {
       res.setHeader("Content-Disposition", "inline");
       res.send(response.data);
     } catch (error) {
+      console.log(`[ERROR] ${error}`);
       if (axios.isAxiosError(error)) {
         console.error("Axios error details:", {
           message: error.message,
@@ -84,8 +85,6 @@ router.get("/", async (req: Request, res: Response) => {
       responseType: responseType,
       headers: ref ? { Referer: ref as string } : {},
     });
-
-    console.log(`[RESPONSE] ${response.data}}`);
 
     // if text/plain or application/json, return as json
     if (responseType === "json") {
@@ -181,6 +180,7 @@ router.get("/", async (req: Request, res: Response) => {
     // pass through the content
     res.send(final);
   } catch (error) {
+    console.log(`[ERROR] ${error}`);
     if (axios.isAxiosError(error)) {
       console.error("Axios error details:", {
         message: error.message,
