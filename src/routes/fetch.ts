@@ -150,7 +150,7 @@ router.get("/", async (req: Request, res: Response) => {
           if (line.startsWith("playlist")) {
             return `${baseSegmentUrl}${encodeURIComponent(
               url.split("/playlist")[0]
-            )}/${line}`;
+            )}/${line}?ref=${encodeURIComponent(ref)}`;
           }
           return line;
         })
