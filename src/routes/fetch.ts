@@ -159,7 +159,7 @@ router.get("/", async (req: Request, res: Response) => {
       m3u8Content = m3u8Content
         .split("\n")
         .map((line) => {
-          if (line.match(/e\d+/)) {
+          if (line.match(/^e\d+/)) {
             // add ref here itself
             let final = `${baseSegmentUrl}${encodeURIComponent(
               url.split("/e")[0]
