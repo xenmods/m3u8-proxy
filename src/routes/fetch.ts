@@ -155,6 +155,24 @@ router.get("/", async (req: Request, res: Response) => {
         })
         .join("\n");
 
+      // FINALLY anivibe m3u8 segments start from e{number}*, so we replace it with OUR_URL/e{number}*
+      m3u8Content = m3u8Content
+        .split("\n")
+        .map((line) => {
+          if (line.match(/e\d+/)) {
+            // add ref here itself
+            let final = `${baseSegmentUrl}${encodeURIComponent(
+              url.split("/e")[0]
+            )}/${line}`;
+            if (ref) {
+              final = `${final}&ref=${encodeURIComponent(ref)}`;
+            }
+            return final;
+          }
+          return line;
+        })
+        .join("\n");
+
       res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
       res.setHeader("Content-Disposition", "inline");
       res.setHeader("Connection", "Keep-Alive");
