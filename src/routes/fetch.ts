@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from "express";
 import axios from "axios";
 import https from "https";
 
+
 const router = Router();
 
 router.get("/", async (req: Request, res: Response) => {
@@ -273,7 +274,8 @@ router.get('/video/*', async (req, res) => {
       const response = await axios.get(videoUrl, {
           headers,
           responseType: 'stream',
-          validateStatus: () => true // Accept all HTTP statuses
+          validateStatus: () => true, // Accept all HTTP statuses
+          httpsAgent: new https.Agent({ keepAlive: true, rejectUnauthorized: false }),
       });
 
       if (response.status >= 400) {
