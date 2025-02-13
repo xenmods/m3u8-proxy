@@ -262,7 +262,8 @@ router.get('/video/*', async (req, res) => {
           return res.status(400).send('Invalid URL');
       }
 
-      const headers = { ...req.headers };
+      // const headers = { ...req.headers };
+      const headers = {}
       delete headers.cookie;
       headers.Referer = 'https://animeheaven.me';
 
