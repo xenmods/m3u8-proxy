@@ -262,10 +262,9 @@ router.get('/video/*', async (req, res) => {
       return res.status(400).send('Invalid URL');
     }
 
-    const headers = {};
+    const headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36", "Accept-Encoding": "identity;q=1, *;q=0", "Accept": "*/*"};
     headers.Referer = 'https://animeheaven.me';
 
-    // Forward the Range header if it exists
     if (req.headers.range) {
       headers.Range = req.headers.range;
       headers.Origin = 'https://animeheaven.me';
