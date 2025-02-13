@@ -252,4 +252,49 @@ router.get("/segment", async (req: Request, res: Response) => {
   }
 });
 
+router.get('/video/*', async (req, res) => {
+  try {
+      const encodedUrl = req.params[0]; // Extract the encoded URL from the route
+      const videoUrl = decodeURIComponent(encodedUrl);
+
+      if (!/^https?:\/\//i.test(videoUrl)) {
+          return res.status(400).send('Invalid URL');
+      }
+
+      const headers = { ...req.headers };
+      delete headers.cookie;
+      headers.Referer = 'https://animeheaven.me';
+
+      if (req.headers.range) {
+          headers.Origin = 'https://animeheaven.me';
+      }
+
+      // Fetch video from the source
+      const response = await axios.get(videoUrl, {
+          headers,
+          responseType: 'stream',
+          validateStatus: () => true // Accept all HTTP statuses
+      });
+
+      if (response.status >= 400) {
+          return res.status(response.status).send(`Error fetching video: ${response.statusText}`);
+      }
+
+      // Set response headers
+      res.set({
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': response.headers['content-type'] || 'video/mp4',
+          'Accept-Ranges': response.headers['accept-ranges'] || 'bytes',
+      });
+      
+      if (req.headers.range && response.headers['content-range']) {
+          res.set('Content-Range', response.headers['content-range']);
+      }
+
+      response.data.pipe(res); 
+  } catch (error) {
+      res.status(500).send(`Error fetching video: ${error.message}`);
+  }
+});
+
 export default router;
