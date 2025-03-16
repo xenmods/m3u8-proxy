@@ -301,5 +301,86 @@ router.get('/video/*', async (req, res) => {
   }
 });
 
+router.get("/hianime", async (req: Request, res: Response) => {
+  const { url, ref } = req.query;
+
+  if (!url || typeof url !== "string") {
+    return res.status(400).json({ error: "No URL provided" });
+  }
+
+
+  try {
+    const headResponse = await axios.head(url, {
+      headers: ref ? { Referer: ref as string } : {},
+    });
+    const contentType = headResponse.headers["content-type"];
+
+    const responseType =
+      contentType?.startsWith("image/") || contentType?.includes("arraybuffer")
+        ? "arraybuffer"
+        : contentType?.includes("json")
+        ? "json"
+        : "text";
+
+    const response = await axios({
+      method: "get",
+      url,
+      responseType: responseType,
+      headers: ref ? { Referer: ref as string } : {},
+    });
+
+    // if text/plain or application/json, return as json
+    if (responseType === "json") {
+      res.json(response.data);
+      return;
+    }
+
+    if (contentType.includes("application/vnd.apple.mpegurl")) {
+      let m3u8Content = response.data.toString("utf-8");
+
+      /// i forgor 😭
+      const baseFetchUrl = `https://${req.get("host")}/fetch?url=`;
+      const baseSegmentUrl = `https://${req.get("host")}/fetch/segment?url=`;
+
+      // hianime starts sub m3u8s with index- so we make it OUR_URL/their_url/(replace master.m3u8 with this: index-*)
+      const hianimeURL = url.substring(0, url.lastIndexOf("/"));
+      m3u8Content = m3u8Content
+      .split("\n")
+      .map((line) => {
+          if (line.startsWith("index-")) {
+              const newURL = `${hianimeURL}/${line}`;
+              return `${baseFetchUrl}${encodeURIComponent(newURL)}`;
+          }
+          return line;
+      })
+.join("\n");
+
+      
+      res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
+      res.setHeader("Content-Disposition", "inline");
+      res.setHeader("Connection", "Keep-Alive");
+      res.send(m3u8Content);
+      return;
+    }
+
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Disposition", "inline");
+
+    let final = response.data;
+
+    // pass through the content
+    res.send(final);
+  } catch (error) {
+    console.log(`[ERROR] ${error}`);
+    if (axios.isAxiosError(error)) {
+      console.error("Axios error details:", {
+        message: error.message,
+        response: error.response?.data,
+        headers: error.config?.headers ?? {},
+      });
+    }
+    res.status(500).json({ error: "Failed to proxy content" });
+  }
+});
 
 export default router;
