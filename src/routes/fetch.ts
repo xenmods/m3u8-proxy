@@ -231,13 +231,13 @@ router.get("/segment", async (req: Request, res: Response) => {
       httpsAgent: new https.Agent({ keepAlive: true }),
     });
 
-    const contentType = response.headers["content-type"] || "video/MP2T";
+    const contentType = url.includes("mon.key") ? response.headers["content-type"] || "video/MP2T" : "video/MP2T";
     res.setHeader("Content-Type", contentType);
     res.setHeader("Content-Disposition", "inline");
     res.setHeader("Connection", "Keep-Alive");
 
-    // finally there is also a mon.key file which we need to proxy
     let final = response.data;
+
 
     res.send(final);
   } catch (error) {
