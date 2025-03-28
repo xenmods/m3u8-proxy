@@ -375,7 +375,7 @@ router.get("/hianime", async (req: Request, res: Response) => {
     let m3u8Content = response.data.toString("utf-8");
 
     /// i forgor 😭
-    const baseFetchUrl = `https://${req.get("host")}/hianime?url=`;
+    const baseFetchUrl = `https://${req.get("host")}/fetch/hianime?url=`;
     const baseSegmentUrl = `https://${req.get("host")}/fetch/segment?url=`;
 
     // hianime starts sub m3u8s with index- so we make it OUR_URL/their_url/(replace master.m3u8 with this: index-*)
@@ -423,7 +423,10 @@ router.get("/hianime", async (req: Request, res: Response) => {
       .split("\n")
       .map((line) => {
         if (line.startsWith("https://") && line.includes("seg-")) {
-          const newURL = `${baseSegmentUrl}${encodeURIComponent(line)}`;
+          let newURL = `${baseSegmentUrl}${encodeURIComponent(line)}`;
+          if (ref) {
+            newURL += `&ref=${encodeURIComponent(ref)}`;
+          }
           return newURL;
         }
         return line;
