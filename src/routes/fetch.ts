@@ -173,30 +173,30 @@ router.get("/", async (req: Request, res: Response) => {
           return line;
         })
         .join("\n");
-        // hianime starts sub m3u8s with index- so we make it OUR_URL/their_url/(replace master.m3u8 with this: index-*)
-        const hianimeURL = url.substring(0, url.lastIndexOf("/"));
-        m3u8Content = m3u8Content
-        .split("\n")
-        .map((line) => {
-            if (line.startsWith("index-")) {
-                const newURL = `${hianimeURL}/${line}`;
-                return `${baseFetchUrl}${encodeURIComponent(newURL)}`;
-            }
-            return line;
-        })
-        .join("\n");
+        // // hianime starts sub m3u8s with index- so we make it OUR_URL/their_url/(replace master.m3u8 with this: index-*)
+        // const hianimeURL = url.substring(0, url.lastIndexOf("/"));
+        // m3u8Content = m3u8Content
+        // .split("\n")
+        // .map((line) => {
+        //     if (line.startsWith("index-")) {
+        //         const newURL = `${hianimeURL}/${line}`;
+        //         return `${baseFetchUrl}${encodeURIComponent(newURL)}`;
+        //     }
+        //     return line;
+        // })
+        // .join("\n");
         
-        // now proxy all segments (jpg, html, png, webp, css, js, etc)
-        m3u8Content = m3u8Content
-        .split("\n")
-        .map((line) => {
-            if (line.startsWith("https://") && line.includes("seg-")) {
-                const newURL = `${baseSegmentUrl}${encodeURIComponent(line)}`;
-                return newURL;
-            }
-            return line;
-        })
-        .join("\n");
+        // // now proxy all segments (jpg, html, png, webp, css, js, etc)
+        // m3u8Content = m3u8Content
+        // .split("\n")
+        // .map((line) => {
+        //     if (line.startsWith("https://") && line.includes("seg-")) {
+        //         const newURL = `${baseSegmentUrl}${encodeURIComponent(line)}`;
+        //         return newURL;
+        //     }
+        //     return line;
+        // })
+        // .join("\n");
 
       res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
       res.setHeader("Content-Disposition", "inline");
@@ -367,17 +367,34 @@ router.get("/hianime", async (req: Request, res: Response) => {
       const baseSegmentUrl = `https://${req.get("host")}/fetch/segment?url=`;
 
       // hianime starts sub m3u8s with index- so we make it OUR_URL/their_url/(replace master.m3u8 with this: index-*)
-      const hianimeURL = url.substring(0, url.lastIndexOf("/"));
-      m3u8Content = m3u8Content
-      .split("\n")
-      .map((line) => {
-          if (line.startsWith("index-")) {
-              const newURL = `${hianimeURL}/${line}`;
-              return `${baseFetchUrl}${encodeURIComponent(newURL)}`;
-          }
-          return line;
-      })
+const hianimeURL = url.substring(0, url.lastIndexOf("/"));
+m3u8Content = m3u8Content
+.split("\n")
+.map((line) => {
+    if (line.startsWith("index-")) {
+        let newURL = `${hianimeURL}/${line}`;
+        newURL = `${baseFetchUrl}${encodeURIComponent(newURL)}`;
+        if (ref) {
+            newURL += `&ref=${encodeURIComponent(ref)}`;
+        }
+        return newURL;
+    }
+    return line;
+})
 .join("\n");
+
+// now proxy all segments (jpg, html, png, webp, css, js, etc)
+m3u8Content = m3u8Content
+.split("\n")
+.map((line) => {
+    if (line.startsWith("https://") && line.includes("seg-")) {
+        const newURL = `${baseSegmentUrl}${encodeURIComponent(line)}`;
+        return newURL;
+    }
+    return line;
+})
+.join("\n");
+
 
       
       res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
