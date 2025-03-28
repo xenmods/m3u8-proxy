@@ -362,6 +362,9 @@ router.get("/hianime", async (req: Request, res: Response) => {
       headers: ref ? { Referer: ref as string } : {},
     });
 
+    console.log(`[INFO] CONTENT TYPE: ${contentType}`);
+    console.log(`[INFO] RESPONSE TYPE: ${responseType}`);
+
     // if text/plain or application/json, return as json
     if (responseType === "json") {
       res.json(response.data);
