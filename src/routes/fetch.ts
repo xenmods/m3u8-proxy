@@ -392,6 +392,29 @@ router.get("/hianime", async (req: Request, res: Response) => {
         })
         .join("\n");
 
+      // we also need to replace the iframe urls
+      m3u8Content = m3u8Content
+        .split("\n")
+        .map((line) => {
+          if (line.startsWith("#EXT-X-I-FRAME-STREAM-INF:")) {
+            // match the URI="iframes-f1-v1-a1.m3u8" part
+            const match = line.match(/URI="([^"]+)"/);
+            if (match) {
+              const iframeUrl = match[1];
+              const newURL = `${hianimeURL}/${iframeUrl}`;
+              const newLine = line.replace(
+                /URI="[^"]+"/,
+                `URI="${baseFetchUrl}${encodeURIComponent(
+                  newURL
+                )}&ref=${encodeURIComponent(ref)}"`
+              );
+              return newLine;
+            }
+          }
+          return line;
+        })
+        .join("\n");
+
       // now proxy all segments (jpg, html, png, webp, css, js, etc)
       m3u8Content = m3u8Content
         .split("\n")
