@@ -2,7 +2,6 @@ import { Router, type Request, type Response } from "express";
 import axios from "axios";
 import https from "https";
 
-
 const router = Router();
 
 router.get("/", async (req: Request, res: Response) => {
@@ -173,30 +172,30 @@ router.get("/", async (req: Request, res: Response) => {
           return line;
         })
         .join("\n");
-        // // hianime starts sub m3u8s with index- so we make it OUR_URL/their_url/(replace master.m3u8 with this: index-*)
-        // const hianimeURL = url.substring(0, url.lastIndexOf("/"));
-        // m3u8Content = m3u8Content
-        // .split("\n")
-        // .map((line) => {
-        //     if (line.startsWith("index-")) {
-        //         const newURL = `${hianimeURL}/${line}`;
-        //         return `${baseFetchUrl}${encodeURIComponent(newURL)}`;
-        //     }
-        //     return line;
-        // })
-        // .join("\n");
-        
-        // // now proxy all segments (jpg, html, png, webp, css, js, etc)
-        // m3u8Content = m3u8Content
-        // .split("\n")
-        // .map((line) => {
-        //     if (line.startsWith("https://") && line.includes("seg-")) {
-        //         const newURL = `${baseSegmentUrl}${encodeURIComponent(line)}`;
-        //         return newURL;
-        //     }
-        //     return line;
-        // })
-        // .join("\n");
+      // // hianime starts sub m3u8s with index- so we make it OUR_URL/their_url/(replace master.m3u8 with this: index-*)
+      // const hianimeURL = url.substring(0, url.lastIndexOf("/"));
+      // m3u8Content = m3u8Content
+      // .split("\n")
+      // .map((line) => {
+      //     if (line.startsWith("index-")) {
+      //         const newURL = `${hianimeURL}/${line}`;
+      //         return `${baseFetchUrl}${encodeURIComponent(newURL)}`;
+      //     }
+      //     return line;
+      // })
+      // .join("\n");
+
+      // // now proxy all segments (jpg, html, png, webp, css, js, etc)
+      // m3u8Content = m3u8Content
+      // .split("\n")
+      // .map((line) => {
+      //     if (line.startsWith("https://") && line.includes("seg-")) {
+      //         const newURL = `${baseSegmentUrl}${encodeURIComponent(line)}`;
+      //         return newURL;
+      //     }
+      //     return line;
+      // })
+      // .join("\n");
 
       res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
       res.setHeader("Content-Disposition", "inline");
@@ -255,13 +254,14 @@ router.get("/segment", async (req: Request, res: Response) => {
       httpsAgent: new https.Agent({ keepAlive: true }),
     });
 
-    const contentType = url.includes("mon.key") ? response.headers["content-type"] || "video/MP2T" : "video/MP2T";
+    const contentType = url.includes("mon.key")
+      ? response.headers["content-type"] || "video/MP2T"
+      : "video/MP2T";
     res.setHeader("Content-Type", contentType);
     res.setHeader("Content-Disposition", "inline");
     res.setHeader("Connection", "Keep-Alive");
 
     let final = response.data;
-
 
     res.send(final);
   } catch (error) {
@@ -277,49 +277,59 @@ router.get("/segment", async (req: Request, res: Response) => {
   }
 });
 
-router.get('/video/*', async (req, res) => {
+router.get("/video/*", async (req, res) => {
   try {
     const encodedUrl = req.params[0]; // Extract the encoded URL from the route
     const videoUrl = decodeURIComponent(encodedUrl);
 
     if (!/^https?:\/\//i.test(videoUrl)) {
-      return res.status(400).send('Invalid URL');
+      return res.status(400).send("Invalid URL");
     }
 
-    const headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36", "Accept-Encoding": "identity;q=1, *;q=0", "Accept": "*/*"};
-    headers.Referer = 'https://animeheaven.me';
+    const headers = {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+      "Accept-Encoding": "identity;q=1, *;q=0",
+      Accept: "*/*",
+    };
+    headers.Referer = "https://animeheaven.me";
 
     if (req.headers.range) {
       headers.Range = req.headers.range;
-      headers.Origin = 'https://animeheaven.me';
+      headers.Origin = "https://animeheaven.me";
     }
 
     // Fetch video from the source
     const response = await axios.get(videoUrl, {
       headers,
-      responseType: 'stream',
+      responseType: "stream",
       validateStatus: () => true, // Accept all HTTP statuses
-      httpsAgent: new https.Agent({ keepAlive: true, rejectUnauthorized: false }),
+      httpsAgent: new https.Agent({
+        keepAlive: true,
+        rejectUnauthorized: false,
+      }),
     });
 
     if (response.status >= 400) {
-      return res.status(response.status).send(`Error fetching video: ${response.statusText}`);
+      return res
+        .status(response.status)
+        .send(`Error fetching video: ${response.statusText}`);
     }
 
     // Set response headers
     res.set({
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': response.headers['content-type'] || 'video/mp4',
-      'Accept-Ranges': response.headers['accept-ranges'] || 'bytes',
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": response.headers["content-type"] || "video/mp4",
+      "Accept-Ranges": response.headers["accept-ranges"] || "bytes",
     });
-    
-    if (req.headers.range && response.headers['content-range']) {
-      res.set('Content-Range', response.headers['content-range']);
+
+    if (req.headers.range && response.headers["content-range"]) {
+      res.set("Content-Range", response.headers["content-range"]);
     }
 
     // If the source returned a 206 Partial Content, forward that status code
     res.status(response.status);
-    response.data.pipe(res); 
+    response.data.pipe(res);
   } catch (error) {
     res.status(500).send(`Error fetching video: ${error.message}`);
   }
@@ -331,7 +341,6 @@ router.get("/hianime", async (req: Request, res: Response) => {
   if (!url || typeof url !== "string") {
     return res.status(400).json({ error: "No URL provided" });
   }
-
 
   try {
     const headResponse = await axios.head(url, {
@@ -363,40 +372,38 @@ router.get("/hianime", async (req: Request, res: Response) => {
       let m3u8Content = response.data.toString("utf-8");
 
       /// i forgor 😭
-      const baseFetchUrl = `https://${req.get("host")}/fetch?url=`;
+      const baseFetchUrl = `https://${req.get("host")}/hianime?url=`;
       const baseSegmentUrl = `https://${req.get("host")}/fetch/segment?url=`;
 
       // hianime starts sub m3u8s with index- so we make it OUR_URL/their_url/(replace master.m3u8 with this: index-*)
-const hianimeURL = url.substring(0, url.lastIndexOf("/"));
-m3u8Content = m3u8Content
-.split("\n")
-.map((line) => {
-    if (line.startsWith("index-")) {
-        let newURL = `${hianimeURL}/${line}`;
-        newURL = `${baseFetchUrl}${encodeURIComponent(newURL)}`;
-        if (ref) {
-            newURL += `&ref=${encodeURIComponent(ref)}`;
-        }
-        return newURL;
-    }
-    return line;
-})
-.join("\n");
+      const hianimeURL = url.substring(0, url.lastIndexOf("/"));
+      m3u8Content = m3u8Content
+        .split("\n")
+        .map((line) => {
+          if (line.startsWith("index-")) {
+            let newURL = `${hianimeURL}/${line}`;
+            newURL = `${baseFetchUrl}${encodeURIComponent(newURL)}`;
+            if (ref) {
+              newURL += `&ref=${encodeURIComponent(ref)}`;
+            }
+            return newURL;
+          }
+          return line;
+        })
+        .join("\n");
 
-// now proxy all segments (jpg, html, png, webp, css, js, etc)
-m3u8Content = m3u8Content
-.split("\n")
-.map((line) => {
-    if (line.startsWith("https://") && line.includes("seg-")) {
-        const newURL = `${baseSegmentUrl}${encodeURIComponent(line)}`;
-        return newURL;
-    }
-    return line;
-})
-.join("\n");
+      // now proxy all segments (jpg, html, png, webp, css, js, etc)
+      m3u8Content = m3u8Content
+        .split("\n")
+        .map((line) => {
+          if (line.startsWith("https://") && line.includes("seg-")) {
+            const newURL = `${baseSegmentUrl}${encodeURIComponent(line)}`;
+            return newURL;
+          }
+          return line;
+        })
+        .join("\n");
 
-
-      
       res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
       res.setHeader("Content-Disposition", "inline");
       res.setHeader("Connection", "Keep-Alive");
