@@ -371,79 +371,79 @@ router.get("/hianime", async (req: Request, res: Response) => {
       return;
     }
 
-    if (contentType.includes("application/vnd.apple.mpegurl")) {
-      let m3u8Content = response.data.toString("utf-8");
+    // if (contentType.includes("application/vnd.apple.mpegurl")) {
+    let m3u8Content = response.data.toString("utf-8");
 
-      /// i forgor 😭
-      const baseFetchUrl = `https://${req.get("host")}/hianime?url=`;
-      const baseSegmentUrl = `https://${req.get("host")}/fetch/segment?url=`;
+    /// i forgor 😭
+    const baseFetchUrl = `https://${req.get("host")}/hianime?url=`;
+    const baseSegmentUrl = `https://${req.get("host")}/fetch/segment?url=`;
 
-      // hianime starts sub m3u8s with index- so we make it OUR_URL/their_url/(replace master.m3u8 with this: index-*)
-      const hianimeURL = url.substring(0, url.lastIndexOf("/"));
-      m3u8Content = m3u8Content
-        .split("\n")
-        .map((line) => {
-          if (line.startsWith("index-")) {
-            let newURL = `${hianimeURL}/${line}`;
-            newURL = `${baseFetchUrl}${encodeURIComponent(newURL)}`;
-            if (ref) {
-              newURL += `&ref=${encodeURIComponent(ref)}`;
-            }
-            return newURL;
+    // hianime starts sub m3u8s with index- so we make it OUR_URL/their_url/(replace master.m3u8 with this: index-*)
+    const hianimeURL = url.substring(0, url.lastIndexOf("/"));
+    m3u8Content = m3u8Content
+      .split("\n")
+      .map((line) => {
+        if (line.startsWith("index-")) {
+          let newURL = `${hianimeURL}/${line}`;
+          newURL = `${baseFetchUrl}${encodeURIComponent(newURL)}`;
+          if (ref) {
+            newURL += `&ref=${encodeURIComponent(ref)}`;
           }
-          return line;
-        })
-        .join("\n");
+          return newURL;
+        }
+        return line;
+      })
+      .join("\n");
 
-      // we also need to replace the iframe urls
-      m3u8Content = m3u8Content
-        .split("\n")
-        .map((line) => {
-          if (line.startsWith("#EXT-X-I-FRAME-STREAM-INF:")) {
-            // match the URI="iframes-f1-v1-a1.m3u8" part
-            const match = line.match(/URI="([^"]+)"/);
-            if (match) {
-              const iframeUrl = match[1];
-              const newURL = `${hianimeURL}/${iframeUrl}`;
-              const newLine = line.replace(
-                /URI="[^"]+"/,
-                `URI="${baseFetchUrl}${encodeURIComponent(
-                  newURL
-                )}&ref=${encodeURIComponent(ref)}"`
-              );
-              return newLine;
-            }
+    // we also need to replace the iframe urls
+    m3u8Content = m3u8Content
+      .split("\n")
+      .map((line) => {
+        if (line.startsWith("#EXT-X-I-FRAME-STREAM-INF:")) {
+          // match the URI="iframes-f1-v1-a1.m3u8" part
+          const match = line.match(/URI="([^"]+)"/);
+          if (match) {
+            const iframeUrl = match[1];
+            const newURL = `${hianimeURL}/${iframeUrl}`;
+            const newLine = line.replace(
+              /URI="[^"]+"/,
+              `URI="${baseFetchUrl}${encodeURIComponent(
+                newURL
+              )}&ref=${encodeURIComponent(ref)}"`
+            );
+            return newLine;
           }
-          return line;
-        })
-        .join("\n");
+        }
+        return line;
+      })
+      .join("\n");
 
-      // now proxy all segments (jpg, html, png, webp, css, js, etc)
-      m3u8Content = m3u8Content
-        .split("\n")
-        .map((line) => {
-          if (line.startsWith("https://") && line.includes("seg-")) {
-            const newURL = `${baseSegmentUrl}${encodeURIComponent(line)}`;
-            return newURL;
-          }
-          return line;
-        })
-        .join("\n");
+    // now proxy all segments (jpg, html, png, webp, css, js, etc)
+    m3u8Content = m3u8Content
+      .split("\n")
+      .map((line) => {
+        if (line.startsWith("https://") && line.includes("seg-")) {
+          const newURL = `${baseSegmentUrl}${encodeURIComponent(line)}`;
+          return newURL;
+        }
+        return line;
+      })
+      .join("\n");
 
-      res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
-      res.setHeader("Content-Disposition", "inline");
-      res.setHeader("Connection", "Keep-Alive");
-      res.send(m3u8Content);
-      return;
-    }
-
-    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
     res.setHeader("Content-Disposition", "inline");
+    res.setHeader("Connection", "Keep-Alive");
+    res.send(m3u8Content);
+    return;
+    // }
 
-    let final = response.data;
+    // res.setHeader("Content-Type", contentType);
+    // res.setHeader("Content-Disposition", "inline");
+
+    // let final = response.data;
 
     // pass through the content
-    res.send(final);
+    // res.send(final);
   } catch (error) {
     console.log(`[ERROR] ${error}`);
     if (axios.isAxiosError(error)) {
