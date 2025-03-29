@@ -1,4 +1,4 @@
-import { Router, type Request, type Response } from "express";
+import { response, Router, type Request, type Response } from "express";
 import axios from "axios";
 import https from "https";
 
@@ -172,30 +172,14 @@ router.get("/", async (req: Request, res: Response) => {
           return line;
         })
         .join("\n");
-      // // hianime starts sub m3u8s with index- so we make it OUR_URL/their_url/(replace master.m3u8 with this: index-*)
-      // const hianimeURL = url.substring(0, url.lastIndexOf("/"));
-      // m3u8Content = m3u8Content
-      // .split("\n")
-      // .map((line) => {
-      //     if (line.startsWith("index-")) {
-      //         const newURL = `${hianimeURL}/${line}`;
-      //         return `${baseFetchUrl}${encodeURIComponent(newURL)}`;
-      //     }
-      //     return line;
-      // })
-      // .join("\n");
 
-      // // now proxy all segments (jpg, html, png, webp, css, js, etc)
+      // lastly, filter the m3u8Content to remove any lines that start with #EXT-X-KEY:METHOD
       // m3u8Content = m3u8Content
-      // .split("\n")
-      // .map((line) => {
-      //     if (line.startsWith("https://") && line.includes("seg-")) {
-      //         const newURL = `${baseSegmentUrl}${encodeURIComponent(line)}`;
-      //         return newURL;
-      //     }
-      //     return line;
-      // })
-      // .join("\n");
+      //   .split("\n")
+      //   .filter((line) => {
+      //     return !line.startsWith("#EXT-X-KEY:METHOD");
+      //   })
+      //   .join("\n");
 
       res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
       res.setHeader("Content-Disposition", "inline");
@@ -219,6 +203,14 @@ router.get("/", async (req: Request, res: Response) => {
       return final;
     });
 
+    // remove line which starts with #EXT-X-KEY:METHOD
+    // final = final
+    //   .split("\n")
+    //   .filter((line) => {
+    //     return !line.startsWith("#EXT-X-KEY:METHOD");
+    //   })
+    //   .join("\n");
+
     // pass through the content
     res.send(final);
   } catch (error) {
@@ -241,9 +233,13 @@ router.get("/segment", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "No URL provided" });
   }
 
+  console.clear();
+  console.log(`[INFO] Fetching segment: ${url}`);
+  console.log(`[INFO] Referrer: ${ref}`);
+  let response: any;
   try {
-    let headers = ref ? { Referer: ref as string } : {};
-    const response = await axios({
+    let headers = ref ? { Referer: ref as string, Origin: ref as string } : {};
+    response = await axios({
       method: "get",
       url,
       responseType: "arraybuffer",
@@ -258,6 +254,7 @@ router.get("/segment", async (req: Request, res: Response) => {
       ? response.headers["content-type"] || "video/MP2T"
       : "video/MP2T";
     res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Length", response.headers["content-length"]);
     res.setHeader("Content-Disposition", "inline");
     res.setHeader("Connection", "Keep-Alive");
 
