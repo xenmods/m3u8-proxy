@@ -3,6 +3,6 @@ WORKDIR /app
 COPY . .
 RUN bun install
 
-EXPOSE 4000
+EXPOSE 4021
 
 CMD ["bun", "start"]
