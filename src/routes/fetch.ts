@@ -356,7 +356,10 @@ router.get("/hianime", async (req: Request, res: Response) => {
       method: "get",
       url,
       responseType: responseType,
-      headers: ref ? { Referer: ref as string } : {},
+      headers: ref ? { 
+        Referer: ref as string,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+       } : {},
     });
 
     console.log(`[INFO] CONTENT TYPE: ${contentType}`);
