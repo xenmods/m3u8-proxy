@@ -92,103 +92,164 @@ router.get("/", async (req: Request, res: Response) => {
       return;
     }
 
-    if (contentType.includes("application/vnd.apple.mpegurl")) {
-      let m3u8Content = response.data.toString("utf-8");
+//     if (contentType.includes("application/vnd.apple.mpegurl")) {
+//       let m3u8Content = response.data.toString("utf-8");
 
-      /// i forgor 😭
-      const baseFetchUrl = `https://${req.get("host")}/fetch?url=`;
-      const baseSegmentUrl = `https://${req.get("host")}/fetch/segment?url=`;
+//       /// i forgor 😭
+//       const baseFetchUrl = `https://${req.get("host")}/fetch?url=`;
+//       const baseSegmentUrl = `https://${req.get("host")}/fetch/segment?url=`;
 
-      m3u8Content = m3u8Content.replace(/([^\s]+\.m3u8)/g, (match: string) => {
-        const absoluteUrl = new URL(match, url).href;
-        let final = `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
-        if (ref) {
-          final = `${final}&ref=${encodeURIComponent(ref)}`;
-        }
-        return final;
-      });
+//       m3u8Content = m3u8Content.replace(/([^\s]+\.m3u8)/g, (match: string) => {
+//         const absoluteUrl = new URL(match, url).href;
+//         let final = `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
+//         if (ref) {
+//           final = `${final}&ref=${encodeURIComponent(ref)}`;
+//         }
+//         return final;
+//       });
 
-      // there will also be file segments. so we replace those
-      m3u8Content = m3u8Content.replace(/([^\s]+\.(?:png|jpg|webp|html|css|js|txt))/g, (match: string) => {
-    const absoluteUrl = new URL(match, url).href;
-    let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
-    if (ref) {
-        final = `${final}&ref=${encodeURIComponent(ref)}`;
-    }
-    return final;
-});
+//       // there will also be file segments. so we replace those
+//       m3u8Content = m3u8Content.replace(/([^\s]+\.(?:png|jpg|webp|html|css|js|txt))/g, (match: string) => {
+//     const absoluteUrl = new URL(match, url).href;
+//     let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
+//     if (ref) {
+//         final = `${final}&ref=${encodeURIComponent(ref)}`;
+//     }
+//     return final;
+// });
 
       
 
-      // there also will be .key files (mon.key)
-      m3u8Content = m3u8Content.replace(/URI="([^"]+)"/g, (match) => {
-        match = match.replaceAll(`URI="`, ``).replaceAll(`"`, ``);
-        const absoluteUrl = new URL(match).href;
-        let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
-        if (ref) {
-          final = `${final}&ref=${encodeURIComponent(ref)}`;
-        }
-        return `URI="${final}"`;
+//       // there also will be .key files (mon.key)
+//       m3u8Content = m3u8Content.replace(/URI="([^"]+)"/g, (match) => {
+//         match = match.replaceAll(`URI="`, ``).replaceAll(`"`, ``);
+//         const absoluteUrl = new URL(match).href;
+//         let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
+//         if (ref) {
+//           final = `${final}&ref=${encodeURIComponent(ref)}`;
+//         }
+//         return `URI="${final}"`;
+//       });
+
+//       // finally, gogoanime m3u8 segments start from ep*, so we replace it with OUR_URL/ep*
+//       m3u8Content = m3u8Content
+//         .split("\n")
+//         .map((line) => {
+//           if (line.startsWith("ep")) {
+//             return `${baseSegmentUrl}${encodeURIComponent(
+//               url.split("/ep")[0]
+//             )}/${line}`;
+//           }
+//           return line;
+//         })
+//         .join("\n");
+
+//       // lastly animez m3u8 segments start from playlist*, so we replace it with OUR_URL/playlist*
+//       m3u8Content = m3u8Content
+//         .split("\n")
+//         .map((line) => {
+//           if (line.startsWith("playlist")) {
+//             return `${baseSegmentUrl}${encodeURIComponent(
+//               url.split("/playlist")[0]
+//             )}/${line}&ref=${encodeURIComponent(ref)}`;
+//           }
+//           return line;
+//         })
+//         .join("\n");
+
+//       // FINALLY anivibe m3u8 segments start from e{number}*, so we replace it with OUR_URL/e{number}*
+//       m3u8Content = m3u8Content
+//         .split("\n")
+//         .map((line) => {
+//           if (line.match(/^e\d+/)) {
+//             // add ref here itself
+//             let final = `${baseSegmentUrl}${encodeURIComponent(
+//               url.split("/e")[0]
+//             )}/${line}`;
+//             if (ref) {
+//               final = `${final}&ref=${encodeURIComponent(ref)}`;
+//             }
+//             return final;
+//           }
+//           return line;
+//         })
+//         .join("\n");
+
+//       // lastly, filter the m3u8Content to remove any lines that start with #EXT-X-KEY:METHOD
+//       // m3u8Content = m3u8Content
+//       //   .split("\n")
+//       //   .filter((line) => {
+//       //     return !line.startsWith("#EXT-X-KEY:METHOD");
+//       //   })
+//       //   .join("\n");
+
+//       res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
+//       res.setHeader("Content-Disposition", "inline");
+//       res.setHeader("Connection", "Keep-Alive");
+//       res.send(m3u8Content);
+//       return;
+//     }
+    if (contentType.includes("application/vnd.apple.mpegurl")) {
+      let m3u8Content = response.data.toString("utf-8");
+
+      const baseFetchUrl = `https://${req.get("host")}/fetch?url=`;
+      const baseSegmentUrl = `https://${req.get("host")}/fetch/segment?url=`;
+
+      const lines = m3u8Content.split("\n");
+
+      const processedLines = lines.map((line) => {
+          const trimmedLine = line.trim();
+
+          // Keep empty lines and the endlist tag as they are
+          if (!trimmedLine || trimmedLine.startsWith("#EXT-X-ENDLIST")) {
+              return trimmedLine;
+          }
+
+          // Rewrite the URI for encryption keys
+          if (trimmedLine.startsWith("#EXT-X-KEY")) {
+              return trimmedLine.replace(/URI="([^"]+)"/, (match, uri) => {
+                  const absoluteUrl = new URL(uri, url).href;
+                  let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
+                  if (ref) {
+                      final = `${final}&ref=${encodeURIComponent(ref as string)}`;
+                  }
+                  return `URI="${final}"`;
+              });
+          }
+
+          // Rewrite URLs for alternate playlists (master playlist pointing to other playlists)
+          if (trimmedLine.endsWith(".m3u8")) {
+              const absoluteUrl = new URL(trimmedLine, url).href;
+              let final = `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
+              if (ref) {
+                  final = `${final}&ref=${encodeURIComponent(ref as string)}`;
+              }
+              return final;
+          }
+
+          // Keep all other directives (lines starting with #) as they are
+          if (trimmedLine.startsWith("#")) {
+              return trimmedLine;
+          }
+
+          // --- At this point, the line must be a media segment URL ---
+          // This single block handles all possible segment formats (full URLs, relative paths, etc.)
+          const absoluteUrl = new URL(trimmedLine, url).href;
+          let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
+          if (ref) {
+              final = `${final}&ref=${encodeURIComponent(ref as string)}`;
+          }
+          return final;
       });
 
-      // finally, gogoanime m3u8 segments start from ep*, so we replace it with OUR_URL/ep*
-      m3u8Content = m3u8Content
-        .split("\n")
-        .map((line) => {
-          if (line.startsWith("ep")) {
-            return `${baseSegmentUrl}${encodeURIComponent(
-              url.split("/ep")[0]
-            )}/${line}`;
-          }
-          return line;
-        })
-        .join("\n");
-
-      // lastly animez m3u8 segments start from playlist*, so we replace it with OUR_URL/playlist*
-      m3u8Content = m3u8Content
-        .split("\n")
-        .map((line) => {
-          if (line.startsWith("playlist")) {
-            return `${baseSegmentUrl}${encodeURIComponent(
-              url.split("/playlist")[0]
-            )}/${line}&ref=${encodeURIComponent(ref)}`;
-          }
-          return line;
-        })
-        .join("\n");
-
-      // FINALLY anivibe m3u8 segments start from e{number}*, so we replace it with OUR_URL/e{number}*
-      m3u8Content = m3u8Content
-        .split("\n")
-        .map((line) => {
-          if (line.match(/^e\d+/)) {
-            // add ref here itself
-            let final = `${baseSegmentUrl}${encodeURIComponent(
-              url.split("/e")[0]
-            )}/${line}`;
-            if (ref) {
-              final = `${final}&ref=${encodeURIComponent(ref)}`;
-            }
-            return final;
-          }
-          return line;
-        })
-        .join("\n");
-
-      // lastly, filter the m3u8Content to remove any lines that start with #EXT-X-KEY:METHOD
-      // m3u8Content = m3u8Content
-      //   .split("\n")
-      //   .filter((line) => {
-      //     return !line.startsWith("#EXT-X-KEY:METHOD");
-      //   })
-      //   .join("\n");
+      const finalM3u8 = processedLines.join("\n");
 
       res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
       res.setHeader("Content-Disposition", "inline");
       res.setHeader("Connection", "Keep-Alive");
-      res.send(m3u8Content);
+      res.send(finalM3u8);
       return;
-    }
+  }
 
     res.setHeader("Content-Type", contentType);
     res.setHeader("Content-Disposition", "inline");
