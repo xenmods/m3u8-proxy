@@ -18,7 +18,8 @@ const app = express();
 // List of domains you want to allow
 const allowedOrigins = [
   'https://animerealms.org',
-  'https://www.animerealms.org'
+  'https://www.animerealms.org',
+  'https://literate-parakeet-xgq4www6q6439xgq-3000.app.github.dev'
 ];
 
 const corsOptions = {
