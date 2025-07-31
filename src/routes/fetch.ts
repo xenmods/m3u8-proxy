@@ -109,7 +109,7 @@ router.get("/", async (req: Request, res: Response) => {
       });
 
       // there will also be file segments. so we replace those
-      m3u8Content = m3u8Content.replace(/([^\s]+\.(?:png|jpg|webp|html|css|js))/g, (match: string) => {
+      m3u8Content = m3u8Content.replace(/([^\s]+\.(?:png|jpg|webp|html|css|js|txt))/g, (match: string) => {
     const absoluteUrl = new URL(match, url).href;
     let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
     if (ref) {
