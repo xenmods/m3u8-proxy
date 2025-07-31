@@ -242,6 +242,8 @@ router.get("/", async (req: Request, res: Response) => {
           return final;
       });
 
+      console.log(`Processed ${processedLines.length}!`)
+
       const finalM3u8 = processedLines.join("\n");
 
       res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
