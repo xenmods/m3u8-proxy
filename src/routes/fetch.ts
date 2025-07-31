@@ -108,15 +108,17 @@ router.get("/", async (req: Request, res: Response) => {
         return final;
       });
 
-      // there will also be .jpg segments. so we replace those (animepahe specifically)
-      m3u8Content = m3u8Content.replace(/([^\s]+\.jpg)/g, (match: string) => {
-        const absoluteUrl = new URL(match, url).href;
-        let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
-        if (ref) {
-          final = `${final}&ref=${encodeURIComponent(ref)}`;
-        }
-        return final;
-      });
+      // there will also be file segments. so we replace those
+      m3u8Content = m3u8Content.replace(/([^\s]+\.(?:png|jpg|webp|html|css|js))/g, (match: string) => {
+    const absoluteUrl = new URL(match, url).href;
+    let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
+    if (ref) {
+        final = `${final}&ref=${encodeURIComponent(ref)}`;
+    }
+    return final;
+});
+
+      
 
       // there also will be .key files (mon.key)
       m3u8Content = m3u8Content.replace(/URI="([^"]+)"/g, (match) => {
