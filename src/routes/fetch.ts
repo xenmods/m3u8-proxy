@@ -315,9 +315,12 @@ router.get("/segment", async (req: Request, res: Response) => {
       httpsAgent: new https.Agent({ keepAlive: true }),
     });
 
-    const contentType = url.includes("mon.key")
+    const contentType = url.includes(".jpg")
+      ? "image/jpeg"
+      : url.includes("mon.key")
       ? response.headers["content-type"] || "video/MP2T"
       : "video/MP2T";
+
     res.setHeader("Content-Type", contentType);
     res.setHeader("Content-Length", response.headers["content-length"]);
     res.setHeader("Content-Disposition", "inline");
