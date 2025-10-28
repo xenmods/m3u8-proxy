@@ -92,104 +92,7 @@ router.get("/", async (req: Request, res: Response) => {
       return;
     }
 
-//     if (contentType.includes("application/vnd.apple.mpegurl")) {
-//       let m3u8Content = response.data.toString("utf-8");
-
-//       /// i forgor 😭
-//       const baseFetchUrl = `https://${req.get("host")}/fetch?url=`;
-//       const baseSegmentUrl = `https://${req.get("host")}/fetch/segment?url=`;
-
-//       m3u8Content = m3u8Content.replace(/([^\s]+\.m3u8)/g, (match: string) => {
-//         const absoluteUrl = new URL(match, url).href;
-//         let final = `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
-//         if (ref) {
-//           final = `${final}&ref=${encodeURIComponent(ref)}`;
-//         }
-//         return final;
-//       });
-
-//       // there will also be file segments. so we replace those
-//       m3u8Content = m3u8Content.replace(/([^\s]+\.(?:png|jpg|webp|html|css|js|txt))/g, (match: string) => {
-//     const absoluteUrl = new URL(match, url).href;
-//     let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
-//     if (ref) {
-//         final = `${final}&ref=${encodeURIComponent(ref)}`;
-//     }
-//     return final;
-// });
-
-      
-
-//       // there also will be .key files (mon.key)
-//       m3u8Content = m3u8Content.replace(/URI="([^"]+)"/g, (match) => {
-//         match = match.replaceAll(`URI="`, ``).replaceAll(`"`, ``);
-//         const absoluteUrl = new URL(match).href;
-//         let final = `${baseSegmentUrl}${encodeURIComponent(absoluteUrl)}`;
-//         if (ref) {
-//           final = `${final}&ref=${encodeURIComponent(ref)}`;
-//         }
-//         return `URI="${final}"`;
-//       });
-
-//       // finally, gogoanime m3u8 segments start from ep*, so we replace it with OUR_URL/ep*
-//       m3u8Content = m3u8Content
-//         .split("\n")
-//         .map((line) => {
-//           if (line.startsWith("ep")) {
-//             return `${baseSegmentUrl}${encodeURIComponent(
-//               url.split("/ep")[0]
-//             )}/${line}`;
-//           }
-//           return line;
-//         })
-//         .join("\n");
-
-//       // lastly animez m3u8 segments start from playlist*, so we replace it with OUR_URL/playlist*
-//       m3u8Content = m3u8Content
-//         .split("\n")
-//         .map((line) => {
-//           if (line.startsWith("playlist")) {
-//             return `${baseSegmentUrl}${encodeURIComponent(
-//               url.split("/playlist")[0]
-//             )}/${line}&ref=${encodeURIComponent(ref)}`;
-//           }
-//           return line;
-//         })
-//         .join("\n");
-
-//       // FINALLY anivibe m3u8 segments start from e{number}*, so we replace it with OUR_URL/e{number}*
-//       m3u8Content = m3u8Content
-//         .split("\n")
-//         .map((line) => {
-//           if (line.match(/^e\d+/)) {
-//             // add ref here itself
-//             let final = `${baseSegmentUrl}${encodeURIComponent(
-//               url.split("/e")[0]
-//             )}/${line}`;
-//             if (ref) {
-//               final = `${final}&ref=${encodeURIComponent(ref)}`;
-//             }
-//             return final;
-//           }
-//           return line;
-//         })
-//         .join("\n");
-
-//       // lastly, filter the m3u8Content to remove any lines that start with #EXT-X-KEY:METHOD
-//       // m3u8Content = m3u8Content
-//       //   .split("\n")
-//       //   .filter((line) => {
-//       //     return !line.startsWith("#EXT-X-KEY:METHOD");
-//       //   })
-//       //   .join("\n");
-
-//       res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
-//       res.setHeader("Content-Disposition", "inline");
-//       res.setHeader("Connection", "Keep-Alive");
-//       res.send(m3u8Content);
-//       return;
-//     }
-    if (contentType.includes("application/vnd.apple.mpegurl")) {
+    // if (contentType.includes("application/vnd.apple.mpegurl")) {
       let m3u8Content = response.data.toString("utf-8");
 
       const baseFetchUrl = `https://${req.get("host")}/fetch?url=`;
@@ -251,22 +154,22 @@ router.get("/", async (req: Request, res: Response) => {
       res.setHeader("Connection", "Keep-Alive");
       res.send(finalM3u8);
       return;
-  }
+  // }
 
-    res.setHeader("Content-Type", contentType);
-    res.setHeader("Content-Disposition", "inline");
+    // res.setHeader("Content-Type", contentType);
+    // res.setHeader("Content-Disposition", "inline");
 
-    // finally there is also a mon.key file which we need to proxy
-    let final = response.data;
-    final = final.replace(/([^\s]+\.key)/g, (match: string) => {
-      const absoluteUrl = new URL(match, url).href;
-      const baseFetchUrl = `https://${req.get("host")}/fetch?url=`;
-      let final = `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
-      if (ref) {
-        final = `${final}&ref=${encodeURIComponent(ref)}`;
-      }
-      return final;
-    });
+    // // finally there is also a mon.key file which we need to proxy
+    // let final = response.data;
+    // final = final.replace(/([^\s]+\.key)/g, (match: string) => {
+    //   const absoluteUrl = new URL(match, url).href;
+    //   const baseFetchUrl = `https://${req.get("host")}/fetch?url=`;
+    //   let final = `${baseFetchUrl}${encodeURIComponent(absoluteUrl)}`;
+    //   if (ref) {
+    //     final = `${final}&ref=${encodeURIComponent(ref)}`;
+    //   }
+    //   return final;
+    // });
 
     // remove line which starts with #EXT-X-KEY:METHOD
     // final = final
@@ -277,7 +180,7 @@ router.get("/", async (req: Request, res: Response) => {
     //   .join("\n");
 
     // pass through the content
-    res.send(final);
+    // res.send(final);
   } catch (error) {
     console.log(`[ERROR] ${error}`);
     if (axios.isAxiosError(error)) {
