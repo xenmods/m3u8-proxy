@@ -218,7 +218,7 @@ router.get("/segment", async (req: Request, res: Response) => {
       httpsAgent: new https.Agent({ keepAlive: true }),
     });
 
-    console.log(`SEGMENT RESPONSE: ${response.headers}`)
+    // console.log(`SEGMENT RESPONSE: ${response.headers}`)
 
     const contentType = url.includes(".jpg")
       ? "image/jpeg"
@@ -227,7 +227,9 @@ router.get("/segment", async (req: Request, res: Response) => {
       : "video/MP2T";
 
     res.setHeader("Content-Type", contentType);
-    res.setHeader("Content-Length", response.headers["content-length"]);
+    if (response.headers["content-length"]) {
+      res.setHeader("Content-Length", response.headers["content-length"]);
+    }
     res.setHeader("Content-Disposition", "inline");
     res.setHeader("Connection", "Keep-Alive");
 
