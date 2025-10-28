@@ -218,6 +218,8 @@ router.get("/segment", async (req: Request, res: Response) => {
       httpsAgent: new https.Agent({ keepAlive: true }),
     });
 
+    console.log(`SEGMENT RESPONSE: ${response.data}`)
+
     const contentType = url.includes(".jpg")
       ? "image/jpeg"
       : url.includes("mon.key")
